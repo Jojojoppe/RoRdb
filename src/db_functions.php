@@ -109,4 +109,45 @@ function db_get_categories(){
 	return $fulltree;
 }
 
+function db_get_items_from_category($category){
+	GLOBAL $database_url;
+	GLOBAL $items_tab_name;
+	GLOBAL $items_col_ID;
+	GLOBAL $items_col_NAME;
+	GLOBAL $items_col_CATEGORY;
+	GLOBAL $items_col_CATEGORYID;
+	GLOBAL $items_col_CATEGORY_SEARCH_LIST;
+	GLOBAL $items_col_CATEGORY_SEARCH_LIST_ID;
+	GLOBAL $items_col_HIDDEN;
+
+	// Get relevant information from items tab where $category (ID!) can be found in the search list
+	$query = "select $items_col_ID,$items_col_NAME,$items_col_CATEGORY,$items_col_CATEGORYID,$items_col_CATEGORY_SEARCH_LIST_ID,$items_col_HIDDEN ".
+		"where ($items_col_CATEGORY_SEARCH_LIST_ID contains '".$category."') and ".
+		"($items_col_HIDDEN=0)";
+	echo $query."<br>";
+	$res = dbLookup($query, $database_url, $items_tab_name);
+	if(db_check_error($res)){
+		return FALSE;
+	}
+
+	// Get table fields
+	$table = $res["table"];
+
+	$itemlist = array();
+	foreach($table["rows"] as $rowarray){
+		$row_ID = $rowarray["c"][0]["v"];
+		$row_NAME = $rowarray["c"][1]["v"];
+		$row_CATEGORY = $rowarray["c"][2]["v"];
+
+		$item = array();
+		$item["id"] = $row_ID;
+		$item["name"] = $row_NAME;
+		$item["category"] = $row_CATEGORY;
+
+		array_push($itemlist, $item);
+	}
+
+	return $itemlist;
+}
+
 ?>
