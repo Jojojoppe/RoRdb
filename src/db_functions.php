@@ -78,8 +78,16 @@ function db_get_categories(){
 	foreach($table["rows"] as $rowarray){
 		$row_ID = $rowarray["c"][0]["v"];
 		$row_NAME = $rowarray["c"][1]["v"];
-		$row_CHILD_LIST = $rowarray["c"][2]["v"];
-		$row_CHILDID_LIST = $rowarray["c"][3]["v"];
+		if(is_null($rowarray["c"][2])){
+			$row_CHILD_LIST = "";
+		}else{
+			$row_CHILD_LIST = $rowarray["c"][2]["v"];
+		}
+		if(is_null($rowarray["c"][3])){
+			$row_CHILDID_LIST = "";
+		}else{
+			$row_CHILDID_LIST = $rowarray["c"][3]["v"];
+		}
 		$row_PARENTID = $rowarray["c"][4]["v"];
 
 		// Check if it is a root node
@@ -167,8 +175,16 @@ function db_get_locations(){
 	foreach($table["rows"] as $rowarray){
 		$row_ID = $rowarray["c"][0]["v"];
 		$row_NAME = $rowarray["c"][1]["v"];
-		$row_CHILD_LIST = $rowarray["c"][2]["v"];
-		$row_CHILDID_LIST = $rowarray["c"][3]["v"];
+		if(is_null($rowarray["c"][2])){
+			$row_CHILD_LIST = "";
+		}else{
+			$row_CHILD_LIST = $rowarray["c"][2]["v"];
+		}
+		if(is_null($rowarray["c"][3])){
+			$row_CHILDID_LIST = "";
+		}else{
+			$row_CHILDID_LIST = $rowarray["c"][3]["v"];
+		}
 		$row_PARENTID = $rowarray["c"][4]["v"];
 
 		// Check if it is a root node
