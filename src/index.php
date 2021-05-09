@@ -1,5 +1,6 @@
 <html>
 <head>
+<title>RoRdb</title>
 <style>
 table, th, td {  border: 1px solid black;}
 </style>
@@ -31,7 +32,7 @@ function items_print($items){
 	echo "<table><tr><th>Item</th><th>Category</th><th>Location</th></tr>";
 	foreach($items as $item){
 		echo "<tr><td>";
-		echo $item["name"];
+		echo "<a href='viewitem.php?id=".$item["id"]."'>".$item["name"]."</a>";
 		echo "</td><td>";
 		echo $item["category"];
 		echo "</td><td>";
