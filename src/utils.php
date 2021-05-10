@@ -6,7 +6,6 @@ function encodeURIComponent($str){
 	return strtr(rawurlencode($str), $revert);
 }
 
-// Do database lookup
 function dbLookup($query, $databaseURL, $sheet){
 	$url = $databaseURL.encodeURIComponent($query)."&sheet=".$sheet;
 	$response = file_get_contents($url);

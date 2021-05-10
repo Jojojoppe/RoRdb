@@ -1,9 +1,2 @@
 ## NEST RoR database backend
-Create file `dburl.php` in the cfg folder with the database query URL and sheet ID as in
-```php
-<?php
-	$database_url = "https://docs.google.com/spreadsheets/d/[spreadsheet ID]/gviz/tq?tq=";
-	$dababase_sheet_id = "[spreadsheet ID]";
-?>
-```
-Copy the service account json to the cfg folder and rename it as `apikey.json`.
+Provide a service account key json file as `apikey.json` in the config directory. If multiple databases are ran with the same service account, provide for each separate instance a different uid in the `appconfig.php` file. To get started run the installer by visiting `src/scripts/install.php` whill whill create a folder on the service account drive and shares it to the admin email specified in the config file. A file `RoRdb.dat` is created as local storage for some important google drive id's.
