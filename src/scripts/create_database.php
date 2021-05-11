@@ -19,12 +19,18 @@ if(array_key_exists($database_filename, $files)){
 }
 echo "Create database spreadsheet\r\n<br>";
 $sheet_id = drive_create_spreadsheet($RoRdb_dat["folderId"], $database_filename);
+// Share with anyone with link
+drive_share($sheet_id, "", "reader");
 $RoRdb_dat["sheetId"] = $sheet_id;
 sheets_create_sheet($sheet_id, $sheet_info_name);
 sheets_delete_sheet($sheet_id, 0);
 sheets_create_sheet($sheet_id, $sheet_categories_name);
 sheets_create_sheet($sheet_id, $sheet_locations_name);
 sheets_create_sheet($sheet_id, $sheet_items_name);
+
+// Save settings in RoRdb.dat and load database functions
+file_put_contents(__DIR__."/../../RoRdb.dat", json_encode($RoRdb_dat));
+require_once __DIR__."/../functions/db_put.php";
 
 // Fill Info tab
 sheets_put_range($sheet_id, $sheet_info_name, "A1", [
@@ -37,17 +43,17 @@ sheets_put_range($sheet_id, $sheet_info_name, "A1", [
 sheets_put_range($sheet_id, $sheet_categories_name, "A1", [
 	["ID", "Name", "Parent", "Parent ID", "Parent name list", "Parent ID list", "Child name list", "Child ID list", "Search tags", "Search tags ID"]
 ]);
+db_put_category("All", "");
 
 // Fill Locations tab
 sheets_put_range($sheet_id, $sheet_locations_name, "A1", [
 	["ID", "Name", "Parent", "Parent ID", "Parent name list", "Parent ID list", "Child name list", "Child ID list", "Search tags", "Search tags ID"]
 ]);
+db_put_location("All", "");
 
 // Fill Items tab
 sheets_put_range($sheet_id, $sheet_items_name, "A1", [
 	["ID", "Name", "Category", "Location"]
 ]);
 
-// Save settings in RoRdb.dat
-file_put_contents(__DIR__."/../../RoRdb.dat", json_encode($RoRdb_dat));
 ?>

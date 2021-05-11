@@ -77,12 +77,14 @@ function drive_ls($folder){
 
 function drive_share($id, $mail, $role){
 	GLOBAL $driveservice;
+	$tp = "user";
+	if($mail=="") $tp="anyone";
 	try{
 		$body = new Google_Service_Drive_Permission([
-			"type"=>"user",
-			"role"=>$role,
-			"emailAddress"=>$mail
+			"type"=>$tp,
+			"role"=>$role
 		]);
+		if($mail!="") $body->setEmailAddress($mail);
 		$res = $driveservice->permissions->create($id, $body, array("sendNotificationEmail"=>false));
 	}catch(exception $e){
 		echo "Somethig went wrong:<br>";

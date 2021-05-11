@@ -6,7 +6,8 @@ function encodeURIComponent($str){
 	return strtr(rawurlencode($str), $revert);
 }
 
-function dbLookup($query, $databaseURL, $sheet){
+function dbLookup($query, $sheetid, $sheet){
+	$databaseURL = "https://docs.google.com/a/google.com/spreadsheets/d/".$sheetid."/gviz/tq?tq=";
 	$url = $databaseURL.encodeURIComponent($query)."&sheet=".$sheet;
 	$response = file_get_contents($url);
 	$response = explode(");", explode("setResponse(", $response)[1])[0];

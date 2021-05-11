@@ -12,6 +12,19 @@ if(!file_exists(__DIR__."/../../RoRdb.dat")){
 $RoRdb_dat = json_decode(file_get_contents(__DIR__."/../../RoRdb.dat"), true);
 $sheet = $RoRdb_dat["sheetId"];
 
+function generate_tree_categories($childlist, $id){
+	$ret = [
+		"id" => $id,
+		"name" => $childlist[$id]["name"],
+		"childs" => array()
+	];
+	foreach($childlist[$id]["childs"] as $c){
+		$cret = generate_tree_categories($childlist, $c);
+		array_push($ret["childs"], $cret);
+	}
+	return $ret;
+}
+
 function db_get_categories(){
 	GLOBAL $sheet;
 	GLOBAL $sheet_info_name;
@@ -38,20 +51,21 @@ function db_get_categories(){
 		array_push($childlist, $c);
 	}
 
-	function generate_tree_categories($childlist, $id){
-		$ret = [
-			"id" => $id,
-			"name" => $childlist[$id]["name"],
-			"childs" => array()
-		];
-		foreach($childlist[$id]["childs"] as $c){
-			$cret = generate_tree_categories($childlist, $c);
-			array_push($ret["childs"], $cret);
-		}
-		return $ret;
-	}
 	$tree = [generate_tree_categories($childlist, 0)];
-	return $tree;
+	return [$tree, $childlist];
+}
+
+function generate_tree_locations($childlist, $id){
+	$ret = [
+		"id" => $id,
+		"name" => $childlist[$id]["name"],
+		"childs" => array()
+	];
+	foreach($childlist[$id]["childs"] as $c){
+		$cret = generate_tree_locations($childlist, $c);
+		array_push($ret["childs"], $cret);
+	}
+	return $ret;
 }
 
 function db_get_locations(){
@@ -80,20 +94,8 @@ function db_get_locations(){
 		array_push($childlist, $c);
 	}
 
-	function generate_tree_locations($childlist, $id){
-		$ret = [
-			"id" => $id,
-			"name" => $childlist[$id]["name"],
-			"childs" => array()
-		];
-		foreach($childlist[$id]["childs"] as $c){
-			$cret = generate_tree_locations($childlist, $c);
-			array_push($ret["childs"], $cret);
-		}
-		return $ret;
-	}
 	$tree = [generate_tree_locations($childlist, 0)];
-	return $tree;
+	return [$tree, $childlist];
 }
 
 ?>
