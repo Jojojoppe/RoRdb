@@ -38,4 +38,5 @@ require_once plugin_dir_path(__FILE__)."includes/googleapi/api.php";
 require_once plugin_dir_path(__FILE__)."includes/database/database.php";
 require_once plugin_dir_path(__FILE__)."includes/admin-page.php";
 require_once plugin_dir_path(__FILE__)."includes/admin-categories.php";
+require_once plugin_dir_path(__FILE__)."includes/admin-locations.php";
 require_once plugin_dir_path(__FILE__)."includes/public-shortcodes.php";

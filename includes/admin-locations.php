@@ -1,20 +1,20 @@
 <?php
 
-function rordb_categories_options_menu(){
+function rordb_locations_options_menu(){
 	add_submenu_page(
         "rordb",                                // parent slug
-        "RoRdb categories",                     // page title
-        "Categories",                           // menu title
+        "RoRdb locations",                      // page title
+        "Locations",                           // menu title
         "manage_options",                       // capability
-        "rordb_categories",                     // menu slug
-        "rordb_categories_options_page_html"    // callable
+        "rordb_locations",                      // menu slug
+        "rordb_locations_options_page_html"     // callable
         // position
     );
 }
-add_action('admin_menu', 'rordb_categories_options_menu');
+add_action('admin_menu', 'rordb_locations_options_menu');
 
 
-function rordb_categories_options_page_html(){
+function rordb_locations_options_page_html(){
 	if(!current_user_can('manage_options')){
 		return;
 	}
@@ -23,15 +23,15 @@ function rordb_categories_options_page_html(){
 
 
     if(isset($_POST["rordb_create_name"])){
-        $db->put_category($_POST["rordb_create_name"], $_POST["rordb_create_parent"]);
+        $db->put_location($_POST["rordb_create_name"], $_POST["rordb_create_parent"]);
         add_settings_error('rordb_messages', 'rordb_message',
-            __('Added category \''.$_POST["rordb_create_name"].'\'', 'rordb'), 'updated');
+            __('Added location \''.$_POST["rordb_create_name"].'\'', 'rordb'), 'updated');
     }
 
     if(isset($_POST["rordb_edit_name"])){
-        $db->update_category($_POST["rordb_edit_id"], $_POST["rordb_edit_name"], $_POST["rordb_edit_parent"]);
+        $db->update_location($_POST["rordb_edit_id"], $_POST["rordb_edit_name"], $_POST["rordb_edit_parent"]);
         add_settings_error('rordb_messages', 'rordb_message',
-            __('Edited category \''.$_POST["rordb_edit_name"].'\'', 'rordb'), 'updated');
+            __('Edited location \''.$_POST["rordb_edit_name"].'\'', 'rordb'), 'updated');
     }
 
 	// Show error/update messages
@@ -43,23 +43,23 @@ function rordb_categories_options_page_html(){
 
         <?php
             if(isset($_GET["rordb_edit"])){
-                $category = $db->get_category($_GET["rordb_edit"]);
-                $currentcatid = $category["id"];
-                $currentcatname = $category["name"];
+                $location = $db->get_location($_GET["rordb_edit"]);
+                $currentcatid = $location["id"];
+                $currentcatname = $location["name"];
                 unset($_GET["rordb_edit"]);
                 $action_url = http_build_query($_GET);
                 ?>
                 <hr>
-                <h3>Edit a category</h3>
+                <h3>Edit a location</h3>
                 <form action="?<?php echo $action_url; ?>" method="post">
                     <input type="hidden" name="rordb_edit_id" value="<?php echo $currentcatid; ?>">
                     <table class="form-table" role="presentation"><tbody>
                         <tr>
-                            <th scope="row">Category name</th>
+                            <th scope="row">Location name</th>
                             <td><input type="text" name="rordb_edit_name" value="<?php echo $currentcatname; ?>"></td>
                         </tr>
                         <tr>
-                            <th scope="row">Category parent</th>
+                            <th scope="row">Location parent</th>
                             <td>
                                 <select name="rordb_edit_parent">
                                 <?php 
@@ -67,13 +67,13 @@ function rordb_categories_options_page_html(){
                                     unset($listlevellength);
                                     $listlevel = "";
                                     $listlevellength = 0;
-                                    $db->categories_execute_recursive(function($c, $lvl, $category){
+                                    $db->locations_execute_recursive(function($c, $lvl, $location){
                                         GLOBAL $listlevel;
                                         GLOBAL $listlevellength;
                                         $name = $c["name"];
                                         $id = $c["id"];
 
-                                        if($id==$category["id"]) return;
+                                        if($id==$location["id"]) return;
 
                                         if($lvl > $listlevellength/4){ 
                                             $listlevel = $listlevel."----";
@@ -83,29 +83,29 @@ function rordb_categories_options_page_html(){
                                             $listlevellength -= 4;
                                         }
                                         echo "<option value='".$name."' ";
-                                        if($id==$category["parentid"]) echo "selected";
+                                        if($id==$location["parentid"]) echo "selected";
                                         echo ">".$listlevel.$name."</option>";
-                                    }, $category);
+                                    }, $location);
                                 ?>
                             </td>
                         </tr>
                     </tbody></table>
-                    <p class="submit"><input type="submit" value="Update category" class="button button-primary"></p>
+                    <p class="submit"><input type="submit" value="Update location" class="button button-primary"></p>
                 </form>
                 <?php
             }
 
                 ?>
         <hr>
-        <h3>Create a category</h3>
+        <h3>Create a location</h3>
         <form action="" method="post">
             <table class="form-table" role="presentation"><tbody>
                 <tr>
-                    <th scope="row">Category name</th>
+                    <th scope="row">Location name</th>
                     <td><input type="text" name="rordb_create_name" value=""></td>
                 </tr>
                 <tr>
-                    <th scope="row">Category parent</th>
+                    <th scope="row">Location parent</th>
                     <td>
                         <select name="rordb_create_parent" value="">
                         <?php 
@@ -113,7 +113,7 @@ function rordb_categories_options_page_html(){
                             unset($listlevellength);
                             $listlevel = "";
                             $listlevellength = 0;
-                            $db->categories_execute_recursive(function($c, $lvl){
+                            $db->locations_execute_recursive(function($c, $lvl){
                                 GLOBAL $listlevel;
                                 GLOBAL $listlevellength;
                                 $name = $c["name"];
@@ -132,18 +132,18 @@ function rordb_categories_options_page_html(){
                     </td>
                 </tr>
             </tbody></table>
-            <p class="submit"><input type="submit" value="Create category" class="button button-primary"></p>
+            <p class="submit"><input type="submit" value="Create location" class="button button-primary"></p>
         </form>
 
         <hr>
-        <h3>List of categories</h3>
+        <h3>List of locations</h3>
         <?php
-            // List the categories
+            // List the locations
             unset($listlevel);
             unset($listlevellength);
             $listlevel = "";
             $listlevellength = 0;
-            $db->categories_execute_recursive(function($c, $lvl){
+            $db->locations_execute_recursive(function($c, $lvl){
                 GLOBAL $listlevel;
                 GLOBAL $listlevellength;
                 $name = $c["name"];

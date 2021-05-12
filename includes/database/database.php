@@ -113,6 +113,7 @@ class RordbDatabase{
 		$this->api->sheets_put_range($sheetid, "Locations", "A1", [
 			["ID", "Name", "Parent", "Parent ID", "Parent name list", "Parent ID list", "Child name list", "Child ID list", "Search tags", "Search tags ID"]
 		]);
+		$this->put_location("All", "");
 
 		update_option('rordb_valid_database', true);
 		update_option('rordb_service_account_mail', $this->api->serviceaccount);
@@ -241,10 +242,42 @@ class RordbDatabase{
 		], false);
 	}
 
+	function put_location($name, $parent){
+		// Get ID of next location
+		$next_id = $this->api->sheets_get_range($this->sheet, "Info", "B2")[0][0];
+		$row = $next_id+2;
+		// Get start cell of new row
+		$range = "A".$row;
+		// Put into sheet
+		$this->api->sheets_put_range($this->sheet, "Locations", $range, [
+			[$next_id, $name, $parent,
+				"=IFERROR(VLOOKUP(C$row, {B2:B, A2:A}, 2, FALSE), \"\")",											// Parent name
+				"=IFERROR(CONCATENATE(B$row, \",\", VLOOKUP(D$row, A2:E, 4, TRUE)), \"\")",							// Parent name list
+				"=IFERROR(CONCATENATE(B$row, \",\", VLOOKUP(D$row, A2:F, 5, TRUE)), \"\")",							// Parent ID list
+				"=IFERROR(CONCATENATE(TEXTJOIN(\",\", TRUE, TRANSPOSE(FILTER(B2:B, C2:C=B$row))), \",\"), \"\")",	// Child name list
+				"=IFERROR(CONCATENATE(TEXTJOIN(\",\", TRUE, TRANSPOSE(FILTER(A2:A, C2:C=B$row))), \",\"), \"\")",	// Child ID list
+				"=CONCATENATE(IFERROR(VLOOKUP(D$row, A$2:I, 9, TRUE), \"\"), \",\", B$row, \",\")",					// Search tags
+				"=CONCATENATE(IFERROR(VLOOKUP(D$row, A$2:J, 10, TRUE), \"\"), \",\", A$row, \",\")",				// Search tags ID
+			]
+		], false);
+	}
+
 	function get_category($id){
 		$row = $id+2;
 		$range = "A$row:J";
 		$cat = $this->api->sheets_get_range($this->sheet, "Categories", $range)[0];
+		return [
+			'id' => $cat[0],
+			'name' => $cat[1],
+			'parent' => $cat[2],
+			'parentid' => $cat[3]
+		];
+	}
+
+	function get_location($id){
+		$row = $id+2;
+		$range = "A$row:J";
+		$cat = $this->api->sheets_get_range($this->sheet, "Locations", $range)[0];
 		return [
 			'id' => $cat[0],
 			'name' => $cat[1],
@@ -280,6 +313,37 @@ class RordbDatabase{
 		// Update category
 		$range = "B".($id+2);
 		$this->api->sheets_put_range($this->sheet, "Categories", $range, [
+			[$name, $parent]
+		], false);	
+	}
+
+	function update_location($id, $name, $parent){
+		$res = $this->get_locations();
+		$locations_flat = $res[1];
+		
+		// Check if new name
+		$newname = false;
+		if($locations_flat[$id]["name"]!=$name) $newname=true;
+		// Check if new parent
+		$newparent = false;
+		if($locations_flat[$id]["parent"]!=$parent) $newparent=true;
+	
+		// If new name update all the children with id as parent
+		if($newname){
+			$query = "select * where C='".$locations_flat[$id]["name"]."'";
+			$ret = $this->db_query($query, "Locations");
+			foreach($ret as $c){
+				// Get starting range of location
+				$range = "C".($c[0]+2);
+				$this->api->sheets_put_range($this->sheet, "Locations", $range, [
+					[$name]
+				], false);	
+			}
+		}
+	
+		// Update location
+		$range = "B".($id+2);
+		$this->api->sheets_put_range($this->sheet, "Locations", $range, [
 			[$name, $parent]
 		], false);	
 	}
