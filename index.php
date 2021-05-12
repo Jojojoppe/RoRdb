@@ -1,3 +1,1 @@
-<?php
-header("Location: src/index.php");
-?>
+<?php // do nothing

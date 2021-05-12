@@ -1,2 +1,1 @@
-## NEST RoR database backend
-Provide a service account key json file as `apikey.json` in the config directory. If multiple databases are ran with the same service account, provide for each separate instance a different uid in the `appconfig.php` file. To get started run the installer by visiting `src/scripts/install.php` whill whill create a folder on the service account drive and shares it to the admin email specified in the config file. A file `RoRdb.dat` is created as local storage for some important google drive id's.
+
