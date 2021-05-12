@@ -4,8 +4,8 @@ function rordb_locations_options_menu(){
 	add_submenu_page(
         "rordb",                                // parent slug
         "RoRdb locations",                      // page title
-        "Locations",                           // menu title
-        "manage_options",                       // capability
+        "Locations",                            // menu title
+        "read",                                 // capability
         "rordb_locations",                      // menu slug
         "rordb_locations_options_page_html"     // callable
         // position
@@ -15,7 +15,10 @@ add_action('admin_menu', 'rordb_locations_options_menu');
 
 
 function rordb_locations_options_page_html(){
-	if(!current_user_can('manage_options')){
+	if(!rordb_can_user_edit_locations()){
+        add_settings_error('rordb_messages', 'rordb_message',
+            __('You do not have permission to view this page', 'rordb'), 'error');
+        settings_errors('rordb_messages'); 
 		return;
 	}
     // Create database object to interact with

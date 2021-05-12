@@ -5,7 +5,7 @@ function rordb_categories_options_menu(){
         "rordb",                                // parent slug
         "RoRdb categories",                     // page title
         "Categories",                           // menu title
-        "manage_options",                       // capability
+        "read",                                 // capability
         "rordb_categories",                     // menu slug
         "rordb_categories_options_page_html"    // callable
         // position
@@ -15,7 +15,10 @@ add_action('admin_menu', 'rordb_categories_options_menu');
 
 
 function rordb_categories_options_page_html(){
-	if(!current_user_can('manage_options')){
+	if(!rordb_can_user_edit_categories()){
+        add_settings_error('rordb_messages', 'rordb_message',
+            __('You do not have permission to view this page', 'rordb'), 'error');
+        settings_errors('rordb_messages');
 		return;
 	}
     // Create database object to interact with

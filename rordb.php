@@ -38,10 +38,33 @@ if(!defined('WPINC')){
 
 define("RORDB_VERSION", "0.0.1-a");
 
+// Google stuff
 require_once plugin_dir_path(__FILE__)."third_party/google-api-php-client--PHP8.0/vendor/autoload.php";
 require_once plugin_dir_path(__FILE__)."includes/googleapi/api.php";
+// RoRdb database interface
 require_once plugin_dir_path(__FILE__)."includes/database/database.php";
+
+// Settings
+require_once plugin_dir_path(__FILE__)."includes/settings_fields.php";
+require_once plugin_dir_path(__FILE__)."includes/settings.php";
+
+// Users
+require_once plugin_dir_path(__FILE__)."includes/users.php";
+
+// Admin pages
 require_once plugin_dir_path(__FILE__)."includes/admin-page.php";
 require_once plugin_dir_path(__FILE__)."includes/admin-categories.php";
 require_once plugin_dir_path(__FILE__)."includes/admin-locations.php";
+
+// Shortcode parser
 require_once plugin_dir_path(__FILE__)."includes/public-shortcodes.php";
+
+// Activation hook
+function rordb_activation(){
+}
+register_activation_hook(__FILE__, "rordb_activation");
+
+// Deactivation hook
+function rordb_deactivation(){
+}
+register_deactivation_hook(__FILE__, "rordb_deactivation");
