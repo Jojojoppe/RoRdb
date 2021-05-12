@@ -1,7 +1,7 @@
 <?php
 /*
 Plugin Name: RoRdb
-Version: 1.0.0
+Version: 0.1
 License: BSD-2
 
 Copyright (c) 2021, Joppe Blondel
@@ -34,6 +34,8 @@ if(!defined('WPINC')){
 define("RORDB_VERSION", "0.1");
 
 require_once plugin_dir_path(__FILE__)."third_party/google-api-php-client--PHP8.0/vendor/autoload.php";
-require_once plugin_dir_path(__FILE__)."includes/admin-page.php";
 require_once plugin_dir_path(__FILE__)."includes/googleapi/api.php";
 require_once plugin_dir_path(__FILE__)."includes/database/database.php";
+require_once plugin_dir_path(__FILE__)."includes/admin-page.php";
+require_once plugin_dir_path(__FILE__)."includes/admin-categories.php";
+require_once plugin_dir_path(__FILE__)."includes/public-shortcodes.php";

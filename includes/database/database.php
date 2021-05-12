@@ -8,6 +8,8 @@ class RordbDatabase{
 
 	function __construct(){
 		$this->api = new RordbGoogleApi();
+		$this->sheet = get_option("rordb_sheet_id");
+		$this->folder = get_option("rordb_drive_id");
 	}
 
 	function load_database(){
@@ -132,12 +134,12 @@ class RordbDatabase{
 
 	function get_categories(){
 		// Get ID of next category to get amount of categories
-		$next_id = $api->sheets_get_range($this->sheet, "Info", "B1")[0][0];
+		$next_id = $this->api->sheets_get_range($this->sheet, "Info", "B1")[0][0];
 		// Get last row
 		$row = $next_id+1;
 		// Calculate range of table
-		$range = "A2:J:$row";
-		$table = $api->sheets_get_range($this->sheet, "Categories", $range);
+		$range = "A2:J$row";
+		$table = $this->api->sheets_get_range($this->sheet, "Categories", $range);
 
 		$childlist = array();
 		foreach($table as $row){
@@ -159,12 +161,12 @@ class RordbDatabase{
 
 	function get_locations(){
 		// Get ID of next location to get amount of locations
-		$next_id = $api->sheets_get_range($this->sheet, "Info", "B2")[0][0];
+		$next_id = $this->api->sheets_get_range($this->sheet, "Info", "B2")[0][0];
 		// Get last row
 		$row = $next_id+1;
 		// Calculate range of table
-		$range = "A2:J:$row";
-		$table = $api->sheets_get_range($this->sheet, "Locations", $range);
+		$range = "A2:J$row";
+		$table = $this->api->sheets_get_range($this->sheet, "Locations", $range);
 
 		$childlist = array();
 		foreach($table as $row){

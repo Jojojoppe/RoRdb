@@ -137,7 +137,15 @@ function rordb_field_checkbox_disabled($args){
 // Top level menu page
 // -------------------
 function rordb_options_menu(){
-	add_menu_page("RoRdb settings", "RoRdb", "manage_options", "rordb", "rordb_options_page_html");
+	add_menu_page(
+		"RoRdb settings", 				// page title
+		"RoRdb", 						// menu title
+		"manage_options", 				// capability
+		"rordb", 						// menu slug
+		"rordb_options_page_html",		// callable
+		file_get_contents(plugin_dir_path(__FILE__)."../admin/images/nest_icon.wpico") // icon url
+		// position
+	);
 }
 add_action('admin_menu', 'rordb_options_menu');
 
@@ -201,7 +209,7 @@ function rordb_options_page_html(){
 	?>
 	<div class="wrap">
 		<h1><?php echo esc_html(get_admin_page_title()); ?></h1>
-		RoRdb needs a Google service account to work. Create a cloud app on <a href='http://console.cloud.google.com'>console.cloud.google.com</a> and 
+		RoRdb (v<?php echo RORDB_VERSION; ?>) needs a Google service account to work. Create a cloud app on <a href='http://console.cloud.google.com'>console.cloud.google.com</a> and 
 		create a service account in it. Create a key for that service account and download it as JSON file. Copy the content of that file and paste it
 		in the dedicated box below. On one service account multiple instances of RoRdb can be ran. Each instance MUST have another UID since a folder
 		is created in the root of the drive of the service account. This UID keeps the folders speratated. You must provide an administrator email which
