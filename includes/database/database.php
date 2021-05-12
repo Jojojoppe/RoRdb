@@ -15,7 +15,7 @@ class RordbDatabase{
 	function load_database(){
 		// Search in service account root for folder RoRdb-UID
 		$uid = get_option('rordb_app_uid');
-		$foldername = "RoRdb".RORDB_VERSION.$uid;
+		$foldername = "RoRdb".$uid;
 
 		$files_in_root = $this->api->drive_ls("root");
 		if(!array_key_exists($foldername, $files_in_root)){
@@ -67,7 +67,7 @@ class RordbDatabase{
 	function create_database(){
 		// Search in service account root for folder RoRdb-UID
 		$uid = get_option('rordb_app_uid');
-		$foldername = "RoRdbv".$uid;
+		$foldername = "RoRdb".$uid;
 
 		$files_in_root = $this->api->drive_ls("root");
 		if(array_key_exists($foldername, $files_in_root)){

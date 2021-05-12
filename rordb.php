@@ -1,8 +1,13 @@
 <?php
 /*
 Plugin Name: RoRdb
-Version: 0.1
+Plugin URI: https://github.com/Jojojoppe/RoRdb
+Version: 0.0.1-a
 License: BSD-2
+Author: Joppe Blondel
+Author URI: https://github.com/Jojojoppe
+Description: Room of Requirements (RoR) database using Google drive and sheets
+Requires PHP: 8
 
 Copyright (c) 2021, Joppe Blondel
 
@@ -31,7 +36,7 @@ if(!defined('WPINC')){
 	die;
 }
 
-define("RORDB_VERSION", "0.1");
+define("RORDB_VERSION", "0.0.1-a");
 
 require_once plugin_dir_path(__FILE__)."third_party/google-api-php-client--PHP8.0/vendor/autoload.php";
 require_once plugin_dir_path(__FILE__)."includes/googleapi/api.php";

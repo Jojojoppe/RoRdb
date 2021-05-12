@@ -21,6 +21,13 @@ function rordb_categories_options_page_html(){
     // Create database object to interact with
     $db = new RordbDatabase();
 
+    // Check if valid database is loaded
+    if(!get_option("rordb_valid_database")){
+        add_settings_error('rordb_messages', 'rordb_message',
+            __('No valid database loaded', 'rordb'), 'error');
+        settings_errors('rordb_messages');   
+        return;
+    }
 
     if(isset($_POST["rordb_create_name"])){
         $db->put_category($_POST["rordb_create_name"], $_POST["rordb_create_parent"]);

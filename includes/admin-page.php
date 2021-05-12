@@ -18,7 +18,7 @@ function rordb_settings_init(){
 	add_settings_field('rordb_field_admin_mail', __('Admin main', 'rordb'),
 		'rordb_field_text', 'rordb', 'rordb_section_main', [
 			'label_for'				=> 'rordb_admin_mail',
-			'description'			=> 'E-mail address to which the service account drive is shared'
+			'description'			=> 'E-mail address to which the service account drive is shared. Affects only database when being created'
 		]);
 	register_setting('rordb', 'rordb_service_account_key', ['default'=>'']);
 	add_settings_field('rordb_field_service_account_key', __('Service account key', 'rordb'),
