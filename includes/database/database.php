@@ -57,6 +57,7 @@ class RordbDatabase{
 		$this->folder = $folderid;
 		$this->sheet = $sheetid;
 		update_option('rordb_valid_database', true);
+		update_option('rordb_service_account_mail', $this->api->serviceaccount);
 		return true;
 	}
 
@@ -109,6 +110,7 @@ class RordbDatabase{
 		]);
 
 		update_option('rordb_valid_database', true);
+		update_option('rordb_service_account_mail', $this->api->serviceaccount);
 		return true;
 	}
 

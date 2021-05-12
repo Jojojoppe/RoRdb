@@ -26,6 +26,12 @@ function rordb_settings_init(){
 			'label_for'				=> 'rordb_service_account_key',
 			'description'			=> 'Service account key JSON file content'
 	]);
+	register_setting('rordb', 'rordb_service_account_mail', ['default'=>'']);
+	add_settings_field('rordb_field_service_account_mail', __('Service account mail', 'rordb'),
+		'rordb_field_text_disabled', 'rordb', 'rordb_section_main', [
+			'label_for'				=> 'rordb_service_account_mail',
+			'description'			=> 'E-mail address of the used service account'
+	]);
 
 	// Service account settings
 	register_setting('rordb', 'rordb_drive_id', ['default'=>'']);
@@ -195,6 +201,16 @@ function rordb_options_page_html(){
 	?>
 	<div class="wrap">
 		<h1><?php echo esc_html(get_admin_page_title()); ?></h1>
+		RoRdb needs a Google service account to work. Create a cloud app on <a href='http://console.cloud.google.com'>console.cloud.google.com</a> and 
+		create a service account in it. Create a key for that service account and download it as JSON file. Copy the content of that file and paste it
+		in the dedicated box below. On one service account multiple instances of RoRdb can be ran. Each instance MUST have another UID since a folder
+		is created in the root of the drive of the service account. This UID keeps the folders speratated. You must provide an administrator email which
+		is used to share the created folder with in case you need access to the database directly. Note: Not specifying any email will cause the folder to
+		be visible for anyone with the link (currently a bug which is worked upon).
+		There are several actions you can do from this settings page, namely 'Load database', '(Re)create database' and 'Delete database'. The first one will
+		search in the service account drive for a valid installation of RoRdb with the set UID. If it is found, the RoRdb wordpress plugin will automatically
+		load all the settings. The second one will create a new installation of RoRdb (and deletes the previous one if it exists). The last will delete the
+		installation of RoRdb.
 		<form action="options.php" method="post">
 			<?php
 			settings_fields('rordb');
