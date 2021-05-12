@@ -202,23 +202,23 @@ class RordbDatabase{
 		return $ret;
 	}
 
-	function execute_recursive_($cats, $level, $func){
+	function execute_recursive_($cats, $level, $func, $e){
 		foreach($cats as $c){
-			$func($c, $level);
-			$this->execute_recursive_($c["childs"], $level+1, $func);
+			$func($c, $level, $e);
+			$this->execute_recursive_($c["childs"], $level+1, $func, $e);
 		}
 	}
 
 	// Traverses the categories recursively and calls func($category, $level)
-	function categories_execute_recursive($func){
+	function categories_execute_recursive($func, $e=null){
 		$categories = $this->get_categories()[0];
-		$this->execute_recursive_($categories, 0, $func);
+		$this->execute_recursive_($categories, 0, $func, $e);
 	}
 
 	// Traverses the locations recursively and calls func($location, $level)
-	function locations_execute_recursive($func){
+	function locations_execute_recursive($func, $e=null){
 		$locations = $this->get_locations()[0];
-		$this->execute_recursive_($locations, 0, $func);
+		$this->execute_recursive_($locations, 0, $func, $e);
 	}
 
 	function put_category($name, $parent){
@@ -251,6 +251,76 @@ class RordbDatabase{
 			'parent' => $cat[2],
 			'parentid' => $cat[3]
 		];
+	}
+
+	function update_category($id, $name, $parent){
+		$res = $this->get_categories();
+		$categories_flat = $res[1];
+		
+		// Check if new name
+		$newname = false;
+		if($categories_flat[$id]["name"]!=$name) $newname=true;
+		// Check if new parent
+		$newparent = false;
+		if($categories_flat[$id]["parent"]!=$parent) $newparent=true;
+	
+		// If new name update all the children with id as parent
+		if($newname){
+			$query = "select * where C='".$categories_flat[$id]["name"]."'";
+			$ret = $this->db_query($query, "Categories");
+			foreach($ret as $c){
+				// Get starting range of category
+				$range = "C".($c[0]+2);
+				$this->api->sheets_put_range($this->sheet, "Categories", $range, [
+					[$name]
+				], false);	
+			}
+		}
+	
+		// Update category
+		$range = "B".($id+2);
+		$this->api->sheets_put_range($this->sheet, "Categories", $range, [
+			[$name, $parent]
+		], false);	
+	}
+
+	function encodeURIComponent($str){
+		$revert = array('%21'=>'!', '%2A'=>'*', '%27'=>"'", '%28'=>'(', '%29'=>')');
+		return strtr(rawurlencode($str), $revert);
+	}
+	
+	function dbLookup($query, $sheetid, $sheet){
+		$databaseURL = "https://docs.google.com/a/google.com/spreadsheets/d/".$sheetid."/gviz/tq?tq=";
+		$url = $databaseURL.$this->encodeURIComponent($query)."&sheet=".$sheet;
+		$response = file_get_contents($url);
+		$response = explode(");", explode("setResponse(", $response)[1])[0];
+		return json_decode($response, TRUE);
+	}
+
+	function db_query($query, $sheetname){
+		$res = $this->dbLookup($query, $this->sheet, $sheetname);
+	
+		// Check for errors
+		if($res["status"]!="ok"){
+			return array();
+		}
+	
+		$rows = $res["table"]["rows"];
+		$retval = array();
+		foreach($rows as $r){
+			$cr = $r["c"];
+			$c = array();
+			foreach($cr as $cell){
+				if(is_null($cell)){
+					array_push($c, "");
+				}else{
+					array_push($c, $cell["v"]);
+				}
+			}
+			array_push($retval, $c);
+		}
+	
+		return $retval;
 	}
 
 }

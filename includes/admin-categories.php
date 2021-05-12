@@ -28,6 +28,12 @@ function rordb_categories_options_page_html(){
             __('Added category \''.$_POST["rordb_create_name"].'\'', 'rordb'), 'updated');
     }
 
+    if(isset($_POST["rordb_edit_name"])){
+        $db->update_category($_POST["rordb_edit_id"], $_POST["rordb_edit_name"], $_POST["rordb_edit_parent"]);
+        add_settings_error('rordb_messages', 'rordb_message',
+            __('Edited category \''.$_POST["rordb_edit_name"].'\'', 'rordb'), 'updated');
+    }
+
 	// Show error/update messages
 	settings_errors('rordb_messages');   
 
@@ -38,17 +44,51 @@ function rordb_categories_options_page_html(){
         <?php
             if(isset($_GET["rordb_edit"])){
                 $category = $db->get_category($_GET["rordb_edit"]);
+                $currentcatid = $category["id"];
+                $currentcatname = $category["name"];
                 unset($_GET["rordb_edit"]);
                 $action_url = http_build_query($_GET);
                 ?>
                 <hr>
                 <h3>Edit a category</h3>
                 <form action="?<?php echo $action_url; ?>" method="post">
-                    <input type="hidden" name="rordb_edit_id" value="<?php echo $category["id"]; ?>">
+                    <input type="hidden" name="rordb_edit_id" value="<?php echo $currentcatid; ?>">
                     <table class="form-table" role="presentation"><tbody>
                         <tr>
                             <th scope="row">Category name</th>
-                            <td><input type="text" name="rordb_edit_name" value="<?php echo $category["name"]; ?>"></td>
+                            <td><input type="text" name="rordb_edit_name" value="<?php echo $currentcatname; ?>"></td>
+                        </tr>
+                        <tr>
+                            <th scope="row">Category parent</th>
+                            <td>
+                                <select name="rordb_edit_parent">
+                                <option value=""></option>
+                                <?php 
+                                    unset($listlevel);
+                                    unset($listlevellength);
+                                    $listlevel = "";
+                                    $listlevellength = 0;
+                                    $db->categories_execute_recursive(function($c, $lvl, $category){
+                                        GLOBAL $listlevel;
+                                        GLOBAL $listlevellength;
+                                        $name = $c["name"];
+                                        $id = $c["id"];
+
+                                        if($id==$category["id"]) return;
+
+                                        if($lvl > $listlevellength/4){ 
+                                            $listlevel = $listlevel."----";
+                                            $listlevellength += 4;
+                                        }else if($lvl < $listlevellength/4){
+                                            $listlevel = substr($listlevel, 0, $listlevellength-4);
+                                            $listlevellength -= 4;
+                                        }
+                                        echo "<option value='".$name."' ";
+                                        if($id==$category["parentid"]) echo "selected";
+                                        echo ">".$listlevel.$name."</option>";
+                                    }, $category);
+                                ?>
+                            </td>
                         </tr>
                     </tbody></table>
                     <p class="submit"><input type="submit" value="Update category" class="button button-primary"></p>
@@ -69,7 +109,10 @@ function rordb_categories_options_page_html(){
                     <th scope="row">Category parent</th>
                     <td>
                         <select name="rordb_create_parent" value="">
+                        <option value=""></option>
                         <?php 
+                            unset($listlevel);
+                            unset($listlevellength);
                             $listlevel = "";
                             $listlevellength = 0;
                             $db->categories_execute_recursive(function($c, $lvl){
@@ -80,7 +123,7 @@ function rordb_categories_options_page_html(){
 
                                 if($lvl > $listlevellength/4){ 
                                     $listlevel = $listlevel."----";
-                                    $listlevellength += 2;
+                                    $listlevellength += 4;
                                 }else if($lvl < $listlevellength/4){
                                     $listlevel = substr($listlevel, 0, $listlevellength-4);
                                     $listlevellength -= 4;
@@ -98,6 +141,8 @@ function rordb_categories_options_page_html(){
         <h3>List of categories</h3>
         <?php
             // List the categories
+            unset($listlevel);
+            unset($listlevellength);
             $listlevel = "";
             $listlevellength = 0;
             $db->categories_execute_recursive(function($c, $lvl){
