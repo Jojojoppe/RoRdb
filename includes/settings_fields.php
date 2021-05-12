@@ -54,6 +54,16 @@ function rordb_field_select($args){
 	echo esc_html_e($args['description']);
 	echo "</p>";
 }
+function rordb_field_checkbox($args){
+	$option = get_option($args['label_for']);
+	echo "<input type='checkbox' id='".esc_attr($args['label_for'])."' ";
+	echo "name='".esc_attr($args['label_for'])."' ";
+	if($option) echo "checked ";
+	echo "value='".$option."'>";
+	echo "<p class='description'>";
+	echo esc_html_e($args['description']);
+	echo "</p>";
+}
 function rordb_field_checkbox_disabled($args){
 	$option = get_option($args['label_for']);
 	echo "<input disabled type='checkbox' id='".esc_attr($args['label_for'])."' ";

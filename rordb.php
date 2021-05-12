@@ -61,10 +61,12 @@ require_once plugin_dir_path(__FILE__)."includes/public-shortcodes.php";
 
 // Activation hook
 function rordb_activation(){
+   rordb_users_init();
 }
 register_activation_hook(__FILE__, "rordb_activation");
 
 // Deactivation hook
 function rordb_deactivation(){
+   rordb_users_deinit();
 }
 register_deactivation_hook(__FILE__, "rordb_deactivation");
