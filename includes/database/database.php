@@ -15,7 +15,7 @@ class RordbDatabase{
 	function load_database(){
 		// Search in service account root for folder RoRdb-UID
 		$uid = get_option('rordb_app_uid');
-		$foldername = "RoRdbv".RORDB_VERSION.$uid;
+		$foldername = "RoRdb".RORDB_VERSION.$uid;
 
 		$files_in_root = $this->api->drive_ls("root");
 		if(!array_key_exists($foldername, $files_in_root)){
@@ -47,12 +47,13 @@ class RordbDatabase{
 
 		// Check database version
 		$version = $this->api->sheets_get_range($sheetid, "Info", "B4")[0][0];
-		if($version!=RORDB_VERSION){
+		$majorexpectedversion = explode('.', RORDB_VERSION)[0];
+		if($version!=$majorexpectedversion){
 			update_option('rordb_drive_id', '');
 			update_option('rordb_sheet_id', '');
 			update_option('rordb_valid_database', false);
 			add_settings_error('rordb_messages', 'rordb_message',
-				__('Database version not mathing: '.RORDB_VERSION.'!='.$version, 'rordb'), 'error');
+				__('Database version not mathing: '.$majorexpectedversion.'!='.$version, 'rordb'), 'error');
 			return false;
 		}
 
@@ -66,7 +67,7 @@ class RordbDatabase{
 	function create_database(){
 		// Search in service account root for folder RoRdb-UID
 		$uid = get_option('rordb_app_uid');
-		$foldername = "RoRdbv".RORDB_VERSION.$uid;
+		$foldername = "RoRdbv".$uid;
 
 		$files_in_root = $this->api->drive_ls("root");
 		if(array_key_exists($foldername, $files_in_root)){
@@ -96,16 +97,18 @@ class RordbDatabase{
 		$this->api->sheets_create_sheet($sheetid, "Locations");
 		$this->api->sheets_create_sheet($sheetid, "Items");
 
+		$majorexpectedversion = explode('.', RORDB_VERSION)[0];
 		$this->api->sheets_put_range($sheetid, "Info", "A1",[
 			["Nr categories", "=COUNT(Categories!A2:A)"],
 			["Nr locations", "=COUNT(Locations!A2:A)"],
 			["Nr items", "=COUNT(Items!A2:A)"],
-			["Database version", RORDB_VERSION]
+			["Database version", $majorexpectedversion]
 		]);
 
 		$this->api->sheets_put_range($sheetid, "Categories", "A1", [
 			["ID", "Name", "Parent", "Parent ID", "Parent name list", "Parent ID list", "Child name list", "Child ID list", "Search tags", "Search tags ID"]
 		]);
+		$this->put_category("All", "");
 
 		$this->api->sheets_put_range($sheetid, "Locations", "A1", [
 			["ID", "Name", "Parent", "Parent ID", "Parent name list", "Parent ID list", "Child name list", "Child ID list", "Search tags", "Search tags ID"]
@@ -119,7 +122,7 @@ class RordbDatabase{
 	function delete_database(){
 		// Search in service account root for folder RoRdb-UID
 		$uid = get_option('rordb_app_uid');
-		$foldername = "RoRdbv".RORDB_VERSION.$uid;
+		$foldername = "RoRdb".$uid;
 
 		$files_in_root = $this->api->drive_ls("root");
 		if(array_key_exists($foldername, $files_in_root)){
@@ -197,6 +200,57 @@ class RordbDatabase{
 			array_push($ret["childs"], $cret);
 		}
 		return $ret;
+	}
+
+	function execute_recursive_($cats, $level, $func){
+		foreach($cats as $c){
+			$func($c, $level);
+			$this->execute_recursive_($c["childs"], $level+1, $func);
+		}
+	}
+
+	// Traverses the categories recursively and calls func($category, $level)
+	function categories_execute_recursive($func){
+		$categories = $this->get_categories()[0];
+		$this->execute_recursive_($categories, 0, $func);
+	}
+
+	// Traverses the locations recursively and calls func($location, $level)
+	function locations_execute_recursive($func){
+		$locations = $this->get_locations()[0];
+		$this->execute_recursive_($locations, 0, $func);
+	}
+
+	function put_category($name, $parent){
+		// Get ID of next category
+		$next_id = $this->api->sheets_get_range($this->sheet, "Info", "B1")[0][0];
+		$row = $next_id+2;
+		// Get start cell of new row
+		$range = "A".$row;
+		// Put into sheet
+		$this->api->sheets_put_range($this->sheet, "Categories", $range, [
+			[$next_id, $name, $parent,
+				"=IFERROR(VLOOKUP(C$row, {B2:B, A2:A}, 2, FALSE), \"\")",											// Parent name
+				"=IFERROR(CONCATENATE(B$row, \",\", VLOOKUP(D$row, A2:E, 4, TRUE)), \"\")",							// Parent name list
+				"=IFERROR(CONCATENATE(B$row, \",\", VLOOKUP(D$row, A2:F, 5, TRUE)), \"\")",							// Parent ID list
+				"=IFERROR(CONCATENATE(TEXTJOIN(\",\", TRUE, TRANSPOSE(FILTER(B2:B, C2:C=B$row))), \",\"), \"\")",	// Child name list
+				"=IFERROR(CONCATENATE(TEXTJOIN(\",\", TRUE, TRANSPOSE(FILTER(A2:A, C2:C=B$row))), \",\"), \"\")",	// Child ID list
+				"=CONCATENATE(IFERROR(VLOOKUP(D$row, A$2:I, 9, TRUE), \"\"), \",\", B$row, \",\")",					// Search tags
+				"=CONCATENATE(IFERROR(VLOOKUP(D$row, A$2:J, 10, TRUE), \"\"), \",\", A$row, \",\")",				// Search tags ID
+			]
+		], false);
+	}
+
+	function get_category($id){
+		$row = $id+2;
+		$range = "A$row:J";
+		$cat = $this->api->sheets_get_range($this->sheet, "Categories", $range)[0];
+		return [
+			'id' => $cat[0],
+			'name' => $cat[1],
+			'parent' => $cat[2],
+			'parentid' => $cat[3]
+		];
 	}
 
 }
