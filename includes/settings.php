@@ -22,7 +22,7 @@ function rordb_settings_init(){
 		]);
 	register_setting('rordb', 'rordb_service_account_key', ['default'=>'']);
 	add_settings_field('rordb_field_service_account_key', __('Service account key', 'rordb'),
-		'rordb_field_textarea', 'rordb', 'rordb_section_main', [
+		'rordb_field_filecontent', 'rordb', 'rordb_section_main', [
 			'label_for'				=> 'rordb_service_account_key',
 			'description'			=> 'Service account key JSON file content'
 	]);

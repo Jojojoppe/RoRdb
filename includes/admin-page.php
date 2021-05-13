@@ -1,5 +1,11 @@
 <?php
 
+// Load javascript files
+function rordb_options_load_javascript(){
+	wp_enqueue_script('rordb_settings_fields_js', plugin_dir_url(__FILE__)."../resources/js/settings_fields.js", array(), null, true);
+}
+add_action('admin_enqueue_scripts', 'rordb_options_load_javascript');
+
 // Top level menu page
 // -------------------
 function rordb_options_menu(){
