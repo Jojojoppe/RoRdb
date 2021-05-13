@@ -185,6 +185,8 @@ class RordbDatabase{
 
 			$childlist = array();
 			foreach($table as $row){
+				// Skip deleted categories
+				if(!array_key_exists(1, $row)) continue;
 				$c = [
 					'id'=>$row[0],
 					'name'=>$row[1],
@@ -193,7 +195,7 @@ class RordbDatabase{
 					'childs'=>explode(',', $row[7])
 				];
 				array_pop($c["childs"]);
-				array_push($childlist, $c);
+				$childlist[$row[0]] =  $c;
 			}
 
 			$tree = [$this->generate_tree_categories_locations($childlist, 0)];
@@ -216,6 +218,8 @@ class RordbDatabase{
 
 			$childlist = array();
 			foreach($table as $row){
+				// Skip deleted locations
+				if(!array_key_exists(1, $row)) continue;
 				$c = [
 					'id'=>$row[0],
 					'name'=>$row[1],
@@ -224,7 +228,7 @@ class RordbDatabase{
 					'childs'=>explode(',', $row[7])
 				];
 				array_pop($c["childs"]);
-				array_push($childlist, $c);
+				$childlist[$row[0]] =  $c;
 			}
 
 			$tree = [$this->generate_tree_categories_locations($childlist, 0)];
@@ -390,6 +394,28 @@ class RordbDatabase{
 		}
 	}
 
+	function delete_category($id){
+		try{
+			$res = $this->get_categories();
+			$categories_flat = $res[1];
+
+			// Update all the children with id as parent -> set to parent of deleted category
+			$query = "select * where C='".$categories_flat[$id]["name"]."'";
+			$ret = $this->db_query($query, "Categories");
+			foreach($ret as $c){
+				$this->update_category($c[0], $c[1], $categories_flat[$id]["parent"]);
+			}
+		
+			// Update category
+			$range = "B".($id+2);
+			$this->api->sheets_put_range($this->sheet, "Categories", $range, [
+				["", "", "", "", "", "", "", "", ""]
+			], false);	
+		}catch(Exception $e){
+			$this->error(__FUNCTION__.": ".$e->getMessage());
+		}
+	}
+
 	function update_location($id, $name, $parent){
 		try{
 			$res = $this->get_locations();
@@ -419,6 +445,28 @@ class RordbDatabase{
 			$range = "B".($id+2);
 			$this->api->sheets_put_range($this->sheet, "Locations", $range, [
 				[$name, $parent]
+			], false);	
+		}catch(Exception $e){
+			$this->error(__FUNCTION__.": ".$e->getMessage());
+		}
+	}
+
+	function delete_location($id){
+		try{
+			$res = $this->get_locations();
+			$locations_flat = $res[1];
+
+			// Update all the children with id as parent -> set to parent of deleted location
+			$query = "select * where C='".$locations_flat[$id]["name"]."'";
+			$ret = $this->db_query($query, "Locations");
+			foreach($ret as $c){
+				$this->update_location($c[0], $c[1], $locations_flat[$id]["parent"]);
+			}
+		
+			// Update location
+			$range = "B".($id+2);
+			$this->api->sheets_put_range($this->sheet, "Locations", $range, [
+				["", "", "", "", "", "", "", "", ""]
 			], false);	
 		}catch(Exception $e){
 			$this->error(__FUNCTION__.": ".$e->getMessage());

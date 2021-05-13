@@ -39,9 +39,16 @@ function rordb_locations_options_page_html(){
     }
 
     if(isset($_POST["rordb_edit_name"])){
-        $db->update_location($_POST["rordb_edit_id"], $_POST["rordb_edit_name"], $_POST["rordb_edit_parent"]);
-        add_settings_error('rordb_messages', 'rordb_message',
-            __('Edited location \''.$_POST["rordb_edit_name"].'\'', 'rordb'), 'updated');
+        // Check if must delete
+        if(isset($_POST["rordb_edit_delete"]) and $_POST["rordb_edit_delete"]==true){
+            $db->delete_location($_POST["rordb_edit_id"]);
+            add_settings_error('rordb_messages', 'rordb_message',
+                __('Deleted location \''.$_POST["rordb_edit_name"].'\'', 'rordb'), 'updated');
+        }else{
+            $db->update_location($_POST["rordb_edit_id"], $_POST["rordb_edit_name"], $_POST["rordb_edit_parent"]);
+            add_settings_error('rordb_messages', 'rordb_message',
+                __('Edited location \''.$_POST["rordb_edit_name"].'\'', 'rordb'), 'updated');
+        }
     }
 
 	// Show error/update messages
@@ -73,36 +80,27 @@ function rordb_locations_options_page_html(){
                             <td>
                                 <select name="rordb_edit_parent">
                                 <?php 
-                                    unset($listlevel);
-                                    unset($listlevellength);
-                                    $listlevel = "";
-                                    $listlevellength = 0;
                                     $db->locations_execute_recursive(function($c, $lvl, $location){
-                                        GLOBAL $listlevel;
-                                        GLOBAL $listlevellength;
                                         $name = $c["name"];
                                         $id = $c["id"];
-
                                         if($id==$location["id"]) return;
-
-                                        if($lvl > $listlevellength/4){ 
-                                            $listlevel = $listlevel."----";
-                                            $listlevellength += 4;
-                                        }else if($lvl < $listlevellength/4){
-                                            $listlevel = substr($listlevel, 0, $listlevellength-4);
-                                            $listlevellength -= 4;
-                                        }
+                                        $indent = str_repeat("----", $lvl);
                                         echo "<option value='".$name."' ";
                                         if($id==$location["parentid"]) echo "selected";
-                                        echo ">".$listlevel.$name."</option>";
+                                        echo ">".$indent.$name."</option>";
                                     }, $location);
                                 ?>
                             </td>
+                        </tr>
+                        <tr>
+                            <th scope="row"> Delete location</th>
+                            <td><input type="checkbox" name="rordb_edit_delete"></td>
                         </tr>
                     </tbody></table>
                     <p class="submit"><input type="submit" value="Update location" class="button button-primary"></p>
                 </form>
                 <?php
+                return;
             }
 
                 ?>
@@ -119,24 +117,11 @@ function rordb_locations_options_page_html(){
                     <td>
                         <select name="rordb_create_parent" value="">
                         <?php 
-                            unset($listlevel);
-                            unset($listlevellength);
-                            $listlevel = "";
-                            $listlevellength = 0;
-                            $db->locations_execute_recursive(function($c, $lvl){
-                                GLOBAL $listlevel;
-                                GLOBAL $listlevellength;
+                            $db->locations_execute_recursive(function($c, $lvl, $p){
                                 $name = $c["name"];
                                 $id = $c["id"];
-
-                                if($lvl > $listlevellength/4){ 
-                                    $listlevel = $listlevel."----";
-                                    $listlevellength += 4;
-                                }else if($lvl < $listlevellength/4){
-                                    $listlevel = substr($listlevel, 0, $listlevellength-4);
-                                    $listlevellength -= 4;
-                                }
-                                echo "<option value='".$name."'>".$listlevel.$name."</option>";
+                                $indent = str_repeat("----", $lvl);
+                                echo "<option value='".$name."'>".$indent.$name."</option>";
                             });
                         ?>
                     </td>
@@ -149,25 +134,11 @@ function rordb_locations_options_page_html(){
         <h3>List of locations</h3>
         <?php
             // List the locations
-            unset($listlevel);
-            unset($listlevellength);
-            $listlevel = "";
-            $listlevellength = 0;
-            $db->locations_execute_recursive(function($c, $lvl){
-                GLOBAL $listlevel;
-                GLOBAL $listlevellength;
+            $db->locations_execute_recursive(function($c, $lvl, $p){
                 $name = $c["name"];
                 $id = $c["id"];
-
-                if($lvl > $listlevellength/4){ 
-                    $listlevel = $listlevel."----";
-                    $listlevellength += 4;
-                }else if($lvl < $listlevellength/4){
-                    $listlevel = substr($listlevel, 0, $listlevellength-4);
-                    $listlevellength -= 4;
-                }
-
-                echo $listlevel."+ ".$name;
+                $indent = str_repeat("----", $lvl);
+                echo $indent."+ ".$name;
                 if($c["id"]!=0){
                     echo " <a href='?";
                     echo http_build_query(array_merge($_GET, array("rordb_edit"=>$id)));
