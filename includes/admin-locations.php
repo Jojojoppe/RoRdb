@@ -83,7 +83,8 @@ function rordb_locations_options_page_html(){
                                     $db->locations_execute_recursive(function($c, $lvl, $location){
                                         $name = $c["name"];
                                         $id = $c["id"];
-                                        if($id==$location["id"]) return;
+                                        // Check if circular dependency will occur if this is set as parent
+                                        if(in_array($location['id'], $c['parents'])) return;
                                         $indent = str_repeat("----", $lvl);
                                         echo "<option value='".$name."' ";
                                         if($id==$location["parentid"]) echo "selected";

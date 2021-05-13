@@ -83,11 +83,13 @@ function rordb_categories_options_page_html(){
                                     $db->categories_execute_recursive(function($c, $lvl, $category){
                                         $name = $c["name"];
                                         $id = $c["id"];
-                                        if($id==$category["id"]) return;
+                                        // Check if circular dependency will occur if this is set as parent
+                                        if(in_array($category['id'], $c['parents'])) return;
                                         $indent = str_repeat("----", $lvl);
                                         echo "<option value='".$name."' ";
                                         if($id==$category["parentid"]) echo "selected";
-                                        echo ">".$indent.$name."</option>";
+                                        echo ">".$indent.$name;
+                                        echo "</option>";
                                     }, $category);
                                 ?>
                             </td>

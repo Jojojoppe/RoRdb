@@ -134,12 +134,12 @@ class RordbDatabase{
 			]);
 
 			$this->api->sheets_put_range($sheetid, "Categories", "A1", [
-				["ID", "Name", "Parent", "Parent ID", "Parent name list", "Parent ID list", "Child name list", "Child ID list", "Search tags", "Search tags ID"]
+				["ID", "Name", "Parent", "Parent ID", "Parent ID list", "Parent name list", "Child name list", "Child ID list", "Search tags", "Search tags ID"]
 			]);
 			$this->put_category("All", "");
 
 			$this->api->sheets_put_range($sheetid, "Locations", "A1", [
-				["ID", "Name", "Parent", "Parent ID", "Parent name list", "Parent ID list", "Child name list", "Child ID list", "Search tags", "Search tags ID"]
+				["ID", "Name", "Parent", "Parent ID", "Parent ID list", "Parent name list", "Child name list", "Child ID list", "Search tags", "Search tags ID"]
 			]);
 			$this->put_location("All", "");
 
@@ -192,7 +192,8 @@ class RordbDatabase{
 					'name'=>$row[1],
 					'parent'=>$row[2],
 					'parentId'=>$row[3],
-					'childs'=>explode(',', $row[7])
+					'childs'=>explode(',', $row[7]),
+					'parents'=>explode(',', $row[4])
 				];
 				array_pop($c["childs"]);
 				$childlist[$row[0]] =  $c;
@@ -225,7 +226,8 @@ class RordbDatabase{
 					'name'=>$row[1],
 					'parent'=>$row[2],
 					'parentId'=>$row[3],
-					'childs'=>explode(',', $row[7])
+					'childs'=>explode(',', $row[7]),
+					'parents'=>explode(',', $row[4])
 				];
 				array_pop($c["childs"]);
 				$childlist[$row[0]] =  $c;
@@ -243,11 +245,14 @@ class RordbDatabase{
 		$ret = [
 			"id" => $id,
 			"name" => $childlist[$id]["name"],
-			"childs" => array()
+			"childs" => array(),
+			"allchilds" => "$id",
+			"parents" => $childlist[$id]["parents"]
 		];
 		foreach($childlist[$id]["childs"] as $c){
 			$cret = $this->generate_tree_categories_locations($childlist, $c);
 			array_push($ret["childs"], $cret);
+			$ret['allchilds'] = $ret['allchilds'].",".$cret['allchilds'];
 		}
 		return $ret;
 	}
@@ -290,8 +295,8 @@ class RordbDatabase{
 			$this->api->sheets_put_range($this->sheet, "Categories", $range, [
 				[$next_id, $name, $parent,
 					"=IFERROR(VLOOKUP(C$row, {B2:B, A2:A}, 2, FALSE), \"\")",											// Parent name
-					"=IFERROR(CONCATENATE(B$row, \",\", VLOOKUP(D$row, A2:E, 4, TRUE)), \"\")",							// Parent name list
-					"=IFERROR(CONCATENATE(B$row, \",\", VLOOKUP(D$row, A2:F, 5, TRUE)), \"\")",							// Parent ID list
+					"=IFERROR(CONCATENATE(A$row, \",\", VLOOKUP(D$row, A2:E, 5, TRUE)), A$row)",							// Parent ID list
+					"=IFERROR(CONCATENATE(B$row, \",\", VLOOKUP(D$row, A2:F, 6, TRUE)), B$row)",							// Parent name list
 					"=IFERROR(CONCATENATE(TEXTJOIN(\",\", TRUE, TRANSPOSE(FILTER(B2:B, C2:C=B$row))), \",\"), \"\")",	// Child name list
 					"=IFERROR(CONCATENATE(TEXTJOIN(\",\", TRUE, TRANSPOSE(FILTER(A2:A, C2:C=B$row))), \",\"), \"\")",	// Child ID list
 					"=CONCATENATE(IFERROR(VLOOKUP(D$row, A$2:I, 9, TRUE), \"\"), \",\", B$row, \",\")",					// Search tags
@@ -314,12 +319,12 @@ class RordbDatabase{
 			$this->api->sheets_put_range($this->sheet, "Locations", $range, [
 				[$next_id, $name, $parent,
 					"=IFERROR(VLOOKUP(C$row, {B2:B, A2:A}, 2, FALSE), \"\")",											// Parent name
-					"=IFERROR(CONCATENATE(B$row, \",\", VLOOKUP(D$row, A2:E, 4, TRUE)), \"\")",							// Parent name list
-					"=IFERROR(CONCATENATE(B$row, \",\", VLOOKUP(D$row, A2:F, 5, TRUE)), \"\")",							// Parent ID list
+					"=IFERROR(CONCATENATE(A$row, \",\", VLOOKUP(D$row, A2:E, 5, TRUE)), A$row)",							// Parent ID list
+					"=IFERROR(CONCATENATE(B$row, \",\", VLOOKUP(D$row, A2:F, 6, TRUE)), B$row)",							// Parent name list
 					"=IFERROR(CONCATENATE(TEXTJOIN(\",\", TRUE, TRANSPOSE(FILTER(B2:B, C2:C=B$row))), \",\"), \"\")",	// Child name list
 					"=IFERROR(CONCATENATE(TEXTJOIN(\",\", TRUE, TRANSPOSE(FILTER(A2:A, C2:C=B$row))), \",\"), \"\")",	// Child ID list
 					"=CONCATENATE(IFERROR(VLOOKUP(D$row, A$2:I, 9, TRUE), \"\"), \",\", B$row, \",\")",					// Search tags
-					"=CONCATENATE(IFERROR(VLOOKUP(D$row, A$2:J, 10, TRUE), \"\"), \",\", A$row, \",\")",				// Search tags ID
+					"=CONCATENATE(IFERROR(VLOOKUP(D$row, A$2:J, 10, TRUE), \"\"), \",\", A$row, \",\")",				// Search tags I
 				]
 			], false);
 		}catch(Exception $e){
@@ -336,7 +341,8 @@ class RordbDatabase{
 				'id' => $cat[0],
 				'name' => $cat[1],
 				'parent' => $cat[2],
-				'parentid' => $cat[3]
+				'parentid' => $cat[3],
+				'parents' => $cat[4]
 			];
 		}catch(Exception $e){
 			$this->error(__FUNCTION__.": ".$e->getMessage());
@@ -352,7 +358,8 @@ class RordbDatabase{
 				'id' => $cat[0],
 				'name' => $cat[1],
 				'parent' => $cat[2],
-				'parentid' => $cat[3]
+				'parentid' => $cat[3],
+				'parents' => $cat[4]
 			];
 		}catch(Exception $e){
 			$this->error(__FUNCTION__.": ".$e->getMessage());
