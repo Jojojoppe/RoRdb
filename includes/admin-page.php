@@ -41,7 +41,7 @@ function rordb_options_page_html(){
 			$db = new RordbDatabase();
 			if(!$db->load_database()){
 				add_settings_error('rordb_messages', 'rordb_message',
-					__('While loading the database an error occured: maybe the database does not exist yet', 'rordb'), 'error');		
+					__('While loading the database an error occured', 'rordb'), 'error');		
 			}
 
 			update_option('rordb_action', '');
@@ -68,7 +68,11 @@ function rordb_options_page_html(){
 
 			update_option('rordb_action', '');
 		}
+
 	}
+
+	// Validate settings
+	//$db = new RordbDatabase();
 
 	// Check if settings are updated
 	if(isset($_GET['settings-updated'])){

@@ -10,15 +10,22 @@ class RordbGoogleApi{
 	function __construct(){
 		$jsonkeystring = get_option('rordb_service_account_key');
 		$jsonkey = json_decode($jsonkeystring, true);
-		$this->serviceaccount = $jsonkey["client_email"];
-		$this->client = new Google_Client();
-		$this->client->setAuthConfig($jsonkey);
-		$this->client->addScope(Google_Service_Sheets::SPREADSHEETS);
-		$this->client->addScope(Google_Service_Drive::DRIVE);
-		$this->client->addScope(Google_Service_Drive::DRIVE_FILE);
+		if(is_null($jsonkey)){
+			throw new Exception(__FUNCTION__.": Could not decode JSON file");
+		}
+		try{
+			$this->serviceaccount = $jsonkey["client_email"];
+			$this->client = new Google_Client();
+			$this->client->setAuthConfig($jsonkey);
+			$this->client->addScope(Google_Service_Sheets::SPREADSHEETS);
+			$this->client->addScope(Google_Service_Drive::DRIVE);
+			$this->client->addScope(Google_Service_Drive::DRIVE_FILE);
 
-		$this->driveservice = new Google_Service_Drive($this->client);
-		$this->sheetsservice = new Google_Service_Sheets($this->client);
+			$this->driveservice = new Google_Service_Drive($this->client);
+			$this->sheetsservice = new Google_Service_Sheets($this->client);
+		}catch(exception $e){
+			throw new Exception(__FUNCTION__.": ".$e->getMessage());
+		}
 	}
 
 	function preprint($s){
@@ -48,8 +55,7 @@ class RordbGoogleApi{
 			}
 			return $files;
 		}catch(exception $e){
-			echo $e->getMessage();
-			return array();
+			throw new Exception(__FUNCTION__.": ".$e->getMessage());
 		}
 	}
 
@@ -57,7 +63,7 @@ class RordbGoogleApi{
 		try{
 			$this->driveservice->files->delete($id);
 		}catch(exception $e){
-			echo $e->getMessage();
+			throw new Exception(__FUNCTION__.": ".$e->getMessage());
 		}
 	}
 
@@ -73,7 +79,7 @@ class RordbGoogleApi{
 			$this->driveservice->permissions->create($id, $body, 
 				array("sendNotificationEmail"=>false));
 		}catch(exception $e){
-			echo $e->getMessage();
+			throw new Exception(__FUNCTION__.": ".$e->getMessage());
 		}
 	}
 
@@ -88,8 +94,7 @@ class RordbGoogleApi{
 				array('fields' => 'id', 'supportsAllDrives' => true));
 			return $res->id;
 		}catch(exception $e){
-			echo $e->getMessage();
-			return "";
+			throw new Exception(__FUNCTION__.": ".$e->getMessage());
 		}
 	}
 
@@ -105,8 +110,7 @@ class RordbGoogleApi{
 			$res = $this->driveservice->files->create($body);
 			return $res->id;
 		}catch(exception $e){
-			echo $e->getMessage();
-			return "";
+			throw new Exception(__FUNCTION__.": ".$e->getMessage());
 		}
 	}
 
@@ -118,8 +122,7 @@ class RordbGoogleApi{
 			$response = $this->sheetsservice->spreadsheets_values->get($id, $rangestring);
 			return $response->getValues();
 		}catch(exception $e){
-			echo $e->getMessage();
-			return array();
+			throw new Exception(__FUNCTION__.": ".$e->getMessage());
 		}
 	}
 
@@ -138,7 +141,7 @@ class RordbGoogleApi{
 			);
 			$response = $this->sheetsservice->spreadsheets_values->update($id, $rangestring, $body, $params);
 		}catch(exception $e){
-			echo $e->getMessage();
+			throw new Exception(__FUNCTION__.": ".$e->getMessage());
 		}
 	}
 
@@ -155,7 +158,7 @@ class RordbGoogleApi{
 			]);
 			$result = $this->sheetsservice->spreadsheets->batchUpdate($id, $body);
 		}catch(exception $e){
-			echo $e->getMessage();
+			throw new Exception(__FUNCTION__.": ".$e->getMessage());
 		}
 	}
 
@@ -170,7 +173,7 @@ class RordbGoogleApi{
 			]);
 			$result = $this->sheetsservice->spreadsheets->batchUpdate($id, $body);
 		}catch(exception $e){
-			echo $e->getMessage();
+			throw new Exception(__FUNCTION__.": ".$e->getMessage());
 		}
 	}
 
