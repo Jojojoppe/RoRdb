@@ -55,6 +55,7 @@ require_once plugin_dir_path(__FILE__)."includes/users.php";
 require_once plugin_dir_path(__FILE__)."includes/admin-page.php";
 require_once plugin_dir_path(__FILE__)."includes/admin-categories.php";
 require_once plugin_dir_path(__FILE__)."includes/admin-locations.php";
+require_once plugin_dir_path(__FILE__)."includes/admin-create_items.php";
 
 // Shortcode parser
 require_once plugin_dir_path(__FILE__)."includes/public-shortcodes.php";

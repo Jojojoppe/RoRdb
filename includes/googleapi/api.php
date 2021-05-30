@@ -114,6 +114,32 @@ class RordbGoogleApi{
 		}
 	}
 
+	// Upload file with $data as file base64 URL
+	function drive_upload_file($folder, $title, $data){
+		try{
+			$arr = explode(",", $data);
+			$mimeType = $arr[0];
+			$filedat = $arr[1];
+			$filetype = explode(";", explode("/", $mimeType)[1])[0];
+
+			$body = new Google_Service_Drive_DriveFile([
+				'mimeType' => explode(";", $mimeType)[0],
+				'name' => $title.".".$filetype,
+				'supportsAllDrives' => TRUE,
+				'driveId' => $folder,
+				'parents' => [$folder],
+				"uploadType" => "multipart",
+			]);
+			$res = $this->driveservice->files->create($body, [
+				'data' => base64_decode($filedat),
+				'mimeType' => $mimeType
+			]);
+			return $res->id;
+		}catch(exception $e){
+			throw new Exception(__FUNCTION__.": ".$e->getMessage());
+		}
+	}
+
 	// Sheets API interface
 	// --------------------
 	function sheets_get_range($id, $sheet, $range){
