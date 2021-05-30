@@ -543,4 +543,61 @@ class RordbDatabase{
 		return $retval;
 	}
 
+	function items_search($searchtag, $specifics, $exc){
+
+		// Used collumns
+		$cols = [
+			'Name' => 'B',
+			'Category' => 'C',
+			'Location' => 'D',
+			'Color' => 'E',
+			'Size' => 'F',
+			'Amount' => 'G',
+			'Comments' => 'H',
+			'Category_tree' => 'I',
+			'Location_tree' => 'J'
+		];
+
+		// Build up search collumns
+		$search_cols = [];
+		foreach($cols as $i=>$v){
+			if(!in_array($i, $exc)){
+				array_push($search_cols, $cols[$i]);
+			}
+		}
+
+		$query = "select * where ";
+
+		// Add specifics
+		foreach($specifics as $k => $v){
+			$col = $cols[$k];
+			if(is_null($v)) continue;
+
+			if($k=="Category_tree"){
+				$query .= $col." contains ',".$v.",' and ";
+			}elseif($k=="Category"){
+				$query .= $col."='".$v."' and ";
+			}elseif($k=="Location_tree"){
+				$query .= $col." contains ',".$v.",' and ";
+			}elseif($k=="Location"){
+				$query .= $col."='".$v."' and ";
+			}else{
+				$query .= $col." contains '".$v."' and ";
+			}
+		}
+
+		// Add generic search tag
+		if(!is_null($searchtag)){
+			$query .= "(";
+			foreach($search_cols as $i){
+				$query .= $i." matches '(?i)(?:.*)$searchtag(?:.*)' or ";
+			}
+			$query .= "1=0) and ";
+		}
+
+		$query .= "0=0";
+		$res = $this->db_query($query, "Items");
+		return $res;
+	}
+
 }

@@ -8,101 +8,86 @@ add_action('admin_enqueue_scripts', 'rordb_options_load_javascript');
 
 // Top level menu page
 // -------------------
-function rordb_options_menu(){
+function rordb_admin_menu(){
 	add_menu_page(
-		"RoRdb settings", 				// page title
-		"RoRdb settings", 				// menu title
+		"RoRdb",         				// page title
+		"RoRdb",      	 				// menu title
 		"read", 						// capability
 		"rordb", 						// menu slug
-		"rordb_options_page_html",		// callable
+		"rordb_admin_page_html",		// callable
 		file_get_contents(plugin_dir_path(__FILE__)."../resources/images/nest_icon.wpico") // icon url
 		// position
 	);
 }
-add_action('admin_menu', 'rordb_options_menu');
+add_action('admin_menu', 'rordb_admin_menu');
 
-// Top level menu page callback
-// ----------------------------
-function rordb_options_page_html(){
-	if(!rordb_can_user_edit_settings()){
-        add_settings_error('rordb_messages', 'rordb_message',
-            __('You do not have permission to view this page', 'rordb'), 'error');
-        settings_errors('rordb_messages');
-		return;
-	}
-
-	// Check for descructive database action
-	if(isset($_GET['settings-updated'])){
-		$action = get_option('rordb_action');
-		if($action=="Load database"){
-			add_settings_error('rordb_messages', 'rordb_message',
-				__('Loading database', 'rordb'), 'updated');
-
-			$db = new RordbDatabase();
-			if(!$db->load_database()){
-				add_settings_error('rordb_messages', 'rordb_message',
-					__('While loading the database an error occured', 'rordb'), 'error');		
-			}
-
-			update_option('rordb_action', '');
-		}else if($action=="(Re)create database"){
-			add_settings_error('rordb_messages', 'rordb_message',
-				__('(Re)create database', 'rordb'), 'updated');
-
-			$db = new RordbDatabase();
-			if(!$db->create_database()){
-				add_settings_error('rordb_messages', 'rordb_message',
-					__('While (re)creating the database an error occured', 'rordb'), 'error');		
-			}
-
-			update_option('rordb_action', '');
-		}else if($action=="Delete database"){
-			add_settings_error('rordb_messages', 'rordb_message',
-				__('Delete database', 'rordb'), 'updated');
-
-			$db = new RordbDatabase();
-			if(!$db->delete_database()){
-				add_settings_error('rordb_messages', 'rordb_message',
-					__('While deleting the database an error occured', 'rordb'), 'error');		
-			}
-
-			update_option('rordb_action', '');
-		}
-
-	}
-
-	// Validate settings
-	//$db = new RordbDatabase();
-
-	// Check if settings are updated
-	if(isset($_GET['settings-updated'])){
-		add_settings_error('rordb_messages', 'rordb_message',
-			__('Settings saved', 'rordb'), 'updated');
-	}
+function rordb_admin_page_html(){
+    // Create database object to interact with
+    $db = new RordbDatabase();
 
 	// Show error/update messages
-	settings_errors('rordb_messages');
+	settings_errors('rordb_messages');   
 
-	?>
+    ?>
 	<div class="wrap">
 		<h1><?php echo esc_html(get_admin_page_title()); ?></h1>
-		RoRdb (v<?php echo RORDB_VERSION; ?>) needs a Google service account to work. Create a cloud app on <a href='http://console.cloud.google.com'>console.cloud.google.com</a> and 
-		create a service account in it. Create a key for that service account and download it as JSON file. Copy the content of that file and paste it
-		in the dedicated box below. On one service account multiple instances of RoRdb can be ran. Each instance MUST have another UID since a folder
-		is created in the root of the drive of the service account. This UID keeps the folders speratated. You must provide an administrator email which
-		is used to share the created folder with in case you need access to the database directly. Note: Not specifying any email will cause the folder to
-		be visible for anyone with the link (currently a bug which is worked upon).
-		There are several actions you can do from this settings page, namely 'Load database', '(Re)create database' and 'Delete database'. The first one will
-		search in the service account drive for a valid installation of RoRdb with the set UID. If it is found, the RoRdb wordpress plugin will automatically
-		load all the settings. The second one will create a new installation of RoRdb (and deletes the previous one if it exists). The last will delete the
-		installation of RoRdb.
-		<form action="options.php" method="post">
-			<?php
-			settings_fields('rordb');
-			do_settings_sections('rordb');
-			submit_button('Save settings');
-			?>
-		</form>
-	</div>
-	<?php
+
+        <form action="" method="get">
+            <input type="hidden" name="page" value="<?php echo $_GET['page'];?>">
+            <input type="text" name="rordb_searchtag">
+            <input type="submit" class="button button-primary" value="Search">
+        </form>
+
+        <table width="100%" border="1px"><tr>
+        <td width="30%" style='padding-top:0'>
+            <h4>Categories</h4>
+            <?php
+                // List the categories
+                $db->categories_execute_recursive(function($c, $lvl, $p){
+                    $name = $c["name"];
+                    $id = $c["id"];
+                    $indent = str_repeat('----', $lvl);
+                    echo $indent."+ ";
+                    echo " <a href='?";
+                    echo http_build_query(array_merge($_GET, array("rordb_category"=>$name)));
+                    echo "'>$name</a>";
+                    echo "<br>";
+                });
+            ?>
+        </td>
+        
+        <td width="50%" style='padding-top:0' height="100%">
+            <h4>Items</h4>
+            <?php
+                if(!isset($_GET['rordb_category'])){
+                    $_GET['rordb_category'] = NULL;
+                }
+                if(!isset($_GET['rordb_searchtag'])){
+                    $_GET['rordb_searchtag'] = NULL;
+                }
+
+                $res = $db->items_search($_GET['rordb_searchtag'], ['Category_tree'=>$_GET['rordb_category']], []);
+                foreach($res as $i){
+                    ?>
+                    <table width="100%" border="1px">
+                    <tr>
+                        <td width="200"><img src="https://drive.google.com/a/nest.utwente.nl/thumbnail?id=<?php echo $i[10];?>&sz=w200-h200"></td>
+                        <td>
+                            Name: <?php echo $i[1];?><br>
+                            Category: <?php echo $i[2];?><br>
+                            Location: <?php echo $i[3];?><br>
+                            Color: <?php echo $i[4];?><br>
+                            Size: <?php echo $i[5];?><br>
+                            Amount: <?php echo $i[6];?><br>
+                            Comments: <?php echo $i[7];?><br>
+                        </td>
+                    </tr>
+                    </table>
+                    <?php
+                }
+            ?>
+        </td>
+        <tr></table>
+    </div>
+    <?php
 }
