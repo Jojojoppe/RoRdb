@@ -42,14 +42,13 @@ function rordb_admin_page_html(){
         <td width="30%" style='padding-top:0'>
             <h4>Categories</h4>
             <?php
-                // List the categories
                 $db->categories_execute_recursive(function($c, $lvl, $p){
                     $name = $c["name"];
                     $id = $c["id"];
                     $indent = str_repeat('----', $lvl);
                     echo $indent."+ ";
                     echo " <a href='?";
-                    echo http_build_query(array_merge($_GET, array("rordb_category"=>$name)));
+                    echo http_build_query(["page"=>"rordb", "rordb_category"=>$name]);
                     echo "'>$name</a>";
                     echo "<br>";
                 });

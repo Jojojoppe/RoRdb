@@ -524,7 +524,7 @@ class RordbDatabase{
 		if($res["status"]!="ok"){
 			return array();
 		}
-	
+
 		$rows = $res["table"]["rows"];
 		$retval = array();
 		foreach($rows as $r){

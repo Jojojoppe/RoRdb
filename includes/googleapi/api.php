@@ -163,7 +163,8 @@ class RordbGoogleApi{
 				'values'=>$values
 			]);
 			$params = array(
-				'valueInputOption' => $inputOption
+				'valueInputOption' => $inputOption,
+				'responseValueRenderOption' => "UNFORMATTED_VALUE"
 			);
 			$response = $this->sheetsservice->spreadsheets_values->update($id, $rangestring, $body, $params);
 		}catch(exception $e){
