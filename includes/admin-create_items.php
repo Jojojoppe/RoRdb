@@ -33,7 +33,8 @@ function rordb_create_items_options_page_html(){
         $db->put_item($_POST['rordb_create_name'], $_POST['rordb_create_category'], $_POST['rordb_create_location'],
             $_POST['rordb_create_color'], $_POST['rordb_create_size'], $_POST['rordb_create_amount'],
             $_POST['rordb_create_comments'],
-            $fid
+            $fid,
+            $_POST['rordb_create_claimed'], $_POST['rordb_create_hidden']
         );
     }
 
@@ -98,6 +99,16 @@ function rordb_create_items_options_page_html(){
                 <tr>
                     <th scope="row">Comments</th>
                     <td><textarea name="rordb_create_comments" value="" rows="10"></textarea><td>
+                </tr>
+
+                <tr>
+                    <th scope="row">Claimed</th>
+                    <td><input type="text" name="rordb_create_claimed" value=""></td>
+                </tr>
+
+                <tr>
+                    <th scopw="row">Hidden</th>
+                    <td><input type="checkbox" name="rordb_create_hidden" value=""></td>
                 </tr>
 
                 <tr>

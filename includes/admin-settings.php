@@ -77,8 +77,7 @@ function rordb_options_page_html(){
 	<div class="wrap">
 		<h1><?php echo esc_html(get_admin_page_title()); ?></h1>
 		RoRdb (v<?php echo RORDB_VERSION; ?>) needs a Google service account to work. Create a cloud app on <a href='http://console.cloud.google.com'>console.cloud.google.com</a> and 
-		create a service account in it. Create a key for that service account and download it as JSON file. Copy the content of that file and paste it
-		in the dedicated box below. On one service account multiple instances of RoRdb can be ran. Each instance MUST have another UID since a folder
+		create a service account in it. Create a key for that service account and download it as JSON file and upload it to the dedicated box below. On one service account multiple instances of RoRdb can be ran. Each instance MUST have another UID since a folder
 		is created in the root of the drive of the service account. This UID keeps the folders speratated. You must provide an administrator email which
 		is used to share the created folder with in case you need access to the database directly. Note: Not specifying any email will cause the folder to
 		be visible for anyone with the link (currently a bug which is worked upon).

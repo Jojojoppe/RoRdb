@@ -144,7 +144,7 @@ class RordbDatabase{
 			$this->put_location("All", "");
 
 			$this->api->sheets_put_range($sheetid, "Items", "A1", [
-				["ID", "Name", "Category", "Location", "Color", "Size", "Amount", "Comments", "Category tags", "Location tags", "Image"]
+				["ID", "Name", "Category", "Location", "Color", "Size", "Amount", "Comments", "Category tags", "Location tags", "Image", "Claimed", "Hidden"]
 			]);
 
 			update_option('rordb_valid_database', true);
@@ -336,8 +336,9 @@ class RordbDatabase{
 		}
 	}
 
-	function put_item($name, $category, $location, $color, $size, $amount, $comments, $image){
+	function put_item($name, $category, $location, $color, $size, $amount, $comments, $image, $claimed, $hidden){
 		try{
+			if($hidden) $hidden = "1"; else $hidden = "0";
 			// Get ID of next item
 			$next_id = $this->api->sheets_get_range($this->sheet, "Info", "B3")[0][0];
 			$row = $next_id+2;
@@ -348,7 +349,7 @@ class RordbDatabase{
 				[$next_id, $name, $category, $location, $color, $size, $amount, $comments,
 					"=VLOOKUP(C$row, {Categories!B2:B, Categories!I2:I}, 2, FALSE)", 
 					"=VLOOKUP(D$row, {Locations!B2:B, Locations!I2:I}, 2, FALSE)", 
-					$image
+					$image, $claimed, $hidden
 				]
 			], false);
 		}catch(exception $e){
@@ -555,7 +556,9 @@ class RordbDatabase{
 			'Amount' => 'G',
 			'Comments' => 'H',
 			'Category_tree' => 'I',
-			'Location_tree' => 'J'
+			'Location_tree' => 'J',
+			'Claimed' => 'L',
+			'Hidden' => 'M'
 		];
 
 		// Build up search collumns
@@ -582,7 +585,7 @@ class RordbDatabase{
 			}elseif($k=="Location"){
 				$query .= $col."='".$v."' and ";
 			}else{
-				$query .= $col." contains '".$v."' and ";
+				$query .= $col." matches '(?i)(?:.*)$v(?:.*)' and ";
 			}
 		}
 
@@ -596,6 +599,9 @@ class RordbDatabase{
 		}
 
 		$query .= "0=0";
+
+		// echo $query;
+
 		$res = $this->db_query($query, "Items");
 		return $res;
 	}
