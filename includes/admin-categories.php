@@ -141,7 +141,7 @@ function rordb_categories_options_page_html(){
                 $id = $c["id"];
                 $indent = str_repeat('----', $lvl);
                 echo $indent."+ ".$name;
-                if($c["id"]!=0){
+                if($c["id"]!=0 && $c["id"]!=1){
                     echo " <a href='?";
                     echo http_build_query(array_merge($_GET, array("rordb_edit"=>$id)));
                     echo "'>edit</a>";

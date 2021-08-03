@@ -10,7 +10,7 @@ add_action('admin_enqueue_scripts', 'rordb_options_load_javascript');
 // -------------------
 function rordb_admin_menu(){
 	add_menu_page(
-		"RoRdb",         				// page title
+		"RoRdb",          				// page title
 		"RoRdb",      	 				// menu title
 		"read", 						// capability
 		"rordb", 						// menu slug

@@ -136,11 +136,13 @@ class RordbDatabase{
 				["ID", "Name", "Parent", "Parent ID", "Parent ID list", "Parent name list", "Child name list", "Child ID list", "Search tags", "Search tags ID"]
 			]);
 			$this->put_category("All", "");
+			$this->put_category("None", "");
 
 			$this->api->sheets_put_range($sheetid, "Locations", "A1", [
 				["ID", "Name", "Parent", "Parent ID", "Parent ID list", "Parent name list", "Child name list", "Child ID list", "Search tags", "Search tags ID"]
 			]);
 			$this->put_location("All", "");
+			$this->put_location("None", "");
 
 			$this->api->sheets_put_range($sheetid, "Items", "A1", [
 				["ID", "Name", "Category", "Location", "Color", "Size", "Amount", "Comments", "Category tags", "Location tags", "Image", "Claimed", "Hidden"]
@@ -247,7 +249,7 @@ class RordbDatabase{
 				$childlist[$row[0]] =  $c;
 			}
 
-			$tree = [$this->generate_tree_categories_locations($childlist, 0)];
+			$tree = [$this->generate_tree_categories_locations($childlist, 0), $this->generate_tree_categories_locations($childlist, 1)];
 
 			return [$tree, $childlist];
 		}catch(Exception $e){
@@ -285,6 +287,17 @@ class RordbDatabase{
 			$this->api->sheets_put_range($this->sheet, "Categories", $range, [
 				[$name, $parent]
 			], false);	
+
+			// Todo change name of category of items placed in this category
+			$query = "select * where C='".$categories_flat[$id]['name']."'";
+			$ret = $this->db_query($query, "Items");
+			foreach($ret as $i){
+				$range = "C".($i[0]+2);
+				$this->api->sheets_put_range($this->sheet, "Items", $range, [
+					[$name]
+				], false);
+			}
+
 		}catch(Exception $e){
 			$this->error(__FUNCTION__.": ".$e->getMessage());
 		}
@@ -307,6 +320,9 @@ class RordbDatabase{
 			$this->api->sheets_put_range($this->sheet, "Categories", $range, [
 				["", "", "", "", "", "", "", "", ""]
 			], false);	
+
+			// TODO update items in this category
+
 		}catch(Exception $e){
 			$this->error(__FUNCTION__.": ".$e->getMessage());
 		}
@@ -382,7 +398,7 @@ class RordbDatabase{
 				$childlist[$row[0]] =  $c;
 			}
 
-			$tree = [$this->generate_tree_categories_locations($childlist, 0)];
+			$tree = [$this->generate_tree_categories_locations($childlist, 0), $this->generate_tree_categories_locations($childlist, 1)];
 
 			return [$tree, $childlist];
 		}catch(Exception $e){
@@ -420,6 +436,17 @@ class RordbDatabase{
 			$this->api->sheets_put_range($this->sheet, "Locations", $range, [
 				[$name, $parent]
 			], false);	
+
+			// Todo change name of location of items placed in this location
+			$query = "select * where D='".$locations_flat[$id]['name']."'";
+			$ret = $this->db_query($query, "Items");
+			foreach($ret as $i){
+				$range = "D".($i[0]+2);
+				$this->api->sheets_put_range($this->sheet, "Items", $range, [
+					[$name]
+				], false);
+			}
+
 		}catch(Exception $e){
 			$this->error(__FUNCTION__.": ".$e->getMessage());
 		}
