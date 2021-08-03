@@ -66,6 +66,7 @@ function rordb_admin_page_html(){
 
             <div id="rordb_search_advanced" style="display:none;">
                 Show hidden items: <input type="checkbox" name="rordb_search_showhidden"><br>
+                Only hidden items: <input type="checkbox" name="rordb_search_onlyhidden"><br>
                 Exclude from search: <select name="rordb_search_exclude[]" multiple>
                     <option>Name</option>
                     <option>Category</option>
@@ -142,6 +143,10 @@ function rordb_admin_page_html(){
                     $specifics['Hidden'] = '0';
                 }
 
+                if(!isset($_GET['rordb_search_onlyhidden']) || $_GET['rordb_search_onlyhidden']=="on"){
+                    $specifics['Onlyhidden'] = '1';
+                }
+
                 $res = $db->items_search($_GET['rordb_searchtag'], $specifics, $exclude);
             }else{
                 $res = $db->items_search($_GET['rordb_searchtag'], ['Category_tree'=>$_GET['rordb_category'], 'Hidden'=>'0'], []);
@@ -151,15 +156,16 @@ function rordb_admin_page_html(){
                 ?>
                 <table width="100%" border="1px">
                 <tr>
-                    <td width="200"><img src="https://drive.google.com/a/nest.utwente.nl/thumbnail?id=<?php echo $i[10];?>&sz=w200-h200"></td>
+                    <td width="200"><img src="https://drive.google.com/thumbnail?id=<?php echo $i[10];?>&sz=w200-h200"></td>
                     <td>
+                        <a href="<?php echo "admin.php?page=rordb_create_items&rordb_edit_item=".$i[0]; ?>">Edit itme</a><br>
                         Name: <?php echo $i[1];?><br>
                         Category: <?php echo $i[2];?><br>
                         Location: <?php echo $i[3];?><br>
                         Color: <?php echo $i[4];?><br>
                         Size: <?php echo $i[5];?><br>
                         Amount: <?php echo $i[6];?><br>
-                        Comments: <?php echo $i[7];?><br>
+                        Comments: <pre><?php echo $i[7];?></pre><br>
                         Claimed: <?php echo $i[11]; ?><br>
                         Hidden: <?php echo $i[12]; ?><br>
                     </td>

@@ -1,5 +1,7 @@
 <?php
 
+//TODO create database share everybody with link!!! WHEN ADDING IMAGES
+
 class RordbDatabase{
 
 	public $api;
@@ -520,7 +522,7 @@ class RordbDatabase{
 
 	function db_query($query, $sheetname){
 		$res = $this->dbLookup($query, $this->sheet, $sheetname);
-	
+
 		// Check for errors
 		if($res["status"]!="ok"){
 			return array();
@@ -548,6 +550,7 @@ class RordbDatabase{
 
 		// Used collumns
 		$cols = [
+			'ID' => 'A',
 			'Name' => 'B',
 			'Category' => 'C',
 			'Location' => 'D',
@@ -571,9 +574,16 @@ class RordbDatabase{
 
 		$query = "select * where ";
 
+		// $this->api->preprint($specifics);
+
 		// Add specifics
 		foreach($specifics as $k => $v){
-			$col = $cols[$k];
+
+			echo $k." -> ".$v."<br>";
+
+			if($k!="Onlyhidden"){
+				$col = $cols[$k];
+			}
 			if(is_null($v)) continue;
 
 			if($k=="Category_tree"){
@@ -583,6 +593,10 @@ class RordbDatabase{
 			}elseif($k=="Location_tree"){
 				$query .= $col." contains ',".$v.",' and ";
 			}elseif($k=="Location"){
+				$query .= $col."='".$v."' and ";
+			}elseif($k=="Onlyhidden"){
+				// TODO
+			}elseif($k=="ID"){
 				$query .= $col."='".$v."' and ";
 			}else{
 				$query .= $col." matches '(?i)(?:.*)$v(?:.*)' and ";
@@ -600,7 +614,7 @@ class RordbDatabase{
 
 		$query .= "0=0";
 
-		// echo $query;
+		echo $query;
 
 		$res = $this->db_query($query, "Items");
 		return $res;
