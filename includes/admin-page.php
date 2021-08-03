@@ -158,7 +158,7 @@ function rordb_admin_page_html(){
                 <tr>
                     <td width="200"><img src="https://drive.google.com/thumbnail?id=<?php echo $i[10];?>&sz=w200-h200"></td>
                     <td>
-                        <a href="<?php echo "admin.php?page=rordb_create_items&rordb_edit_item=".$i[0]; ?>">Edit itme</a><br>
+                        <a href="<?php echo "admin.php?page=rordb_create_items&rordb_edit_item=".$i[0]; ?>">Edit item</a><br>
                         Name: <?php echo $i[1];?><br>
                         Category: <?php echo $i[2];?><br>
                         Location: <?php echo $i[3];?><br>

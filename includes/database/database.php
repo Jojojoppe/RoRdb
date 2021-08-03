@@ -525,7 +525,7 @@ class RordbDatabase{
 		// Add specifics
 		foreach($specifics as $k => $v){
 
-			echo $k." -> ".$v."<br>";
+			// echo $k." -> ".$v."<br>";
 
 			if($k!="Onlyhidden"){
 				$col = $cols[$k];
@@ -560,7 +560,7 @@ class RordbDatabase{
 
 		$query .= "0=0";
 
-		echo $query;
+		// echo $query;
 
 		$res = $this->db_query($query, "Items");
 		return $res;

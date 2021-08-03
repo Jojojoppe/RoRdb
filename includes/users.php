@@ -9,6 +9,10 @@ function rordb_users_init(){
         "rordb_edit_locations"=>true,
         "rordb_edit_items"=>true
     ]);
+    // Create RoRdb viewer role
+    wp_roles()->add_role("rordb_viewer", "RoRdb viewer", [
+        "rordb_edit_items"=>true
+    ]);
 
     // Add capabilities to administrator
     $admin = wp_roles()->get_role("administrator");
@@ -27,6 +31,7 @@ function rordb_users_deinit(){
     $admin->remove_cap("rordb_edit_locations");
     $admin->remove_cap("rordb_edit_items");
     wp_roles()->remove_role("rordb");
+    wp_roles()->remove_role("rordb_viewer");
 }
 
 // Register cap groups with the Members plugin (if used)
