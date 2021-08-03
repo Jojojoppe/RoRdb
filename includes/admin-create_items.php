@@ -28,13 +28,25 @@ function rordb_create_items_options_page_html(){
 
         if(isset($_POST["rordb_edit_item"])){
 
+            $i = $db->db_query("select * where A=".$_GET['rordb_edit_item'], "Items")[0];
+            $fid = $i[10];
+
             if($_POST["rordb_create_img"]!=""){
                 // Upload image to drive
                 $foldername = get_option('rordb_drive_id');
                 $fid = $db->api->drive_upload_file($foldername, "img".uniqid(), $_POST['rordb_create_img']);
+                $db->api->drive_share($fid, "", "reader");
 
                 add_settings_error('rordb_messages', 'rordb_message', __('Item image updated', 'rordb'), 'updated');
             }
+
+            // Edit the item
+            $db->update_item($_GET['rordb_edit_item'], $_POST['rordb_create_name'], $_POST['rordb_create_category'], $_POST['rordb_create_location'],
+                $_POST['rordb_create_color'], $_POST['rordb_create_size'], $_POST['rordb_create_amount'],
+                $_POST['rordb_create_comments'],
+                $fid,
+                $_POST['rordb_create_claimed'], $_POST['rordb_create_hidden']
+            );
 
             add_settings_error('rordb_messages', 'rordb_message', __('Item edited', 'rordb'), 'updated');
         }else{
@@ -44,6 +56,7 @@ function rordb_create_items_options_page_html(){
                 // Upload image to drive
                 $foldername = get_option('rordb_drive_id');
                 $fid = $db->api->drive_upload_file($foldername, "img".uniqid(), $_POST['rordb_create_img']);
+                $db->api->drive_share($fid, "", "reader");
                 // Add item to database
                 $db->put_item($_POST['rordb_create_name'], $_POST['rordb_create_category'], $_POST['rordb_create_location'],
                     $_POST['rordb_create_color'], $_POST['rordb_create_size'], $_POST['rordb_create_amount'],
