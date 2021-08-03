@@ -40,6 +40,10 @@ function rordb_create_items_options_page_html(){
                 add_settings_error('rordb_messages', 'rordb_message', __('Item image updated', 'rordb'), 'updated');
             }
 
+            if(!isset($_POST['rordb_create_hidden'])) $_POST['rordb_create_hidden'] = 0;
+            elseif($_POST['rordb_create_hidden']=="off") $_POST['rordb_create_hidden'] = 0;
+            else $_POST['rordb_create_hidden'] = 1;
+
             // Edit the item
             $db->update_item($_GET['rordb_edit_item'], $_POST['rordb_create_name'], $_POST['rordb_create_category'], $_POST['rordb_create_location'],
                 $_POST['rordb_create_color'], $_POST['rordb_create_size'], $_POST['rordb_create_amount'],
@@ -151,7 +155,7 @@ function rordb_create_items_options_page_html(){
 
                     <tr>
                         <th scopw="row">Hidden</th>
-                        <td><input type="checkbox" name="rordb_create_hidden" <?php if($items[12]==0) echo "checked"; ?>></td>
+                        <td><input type="checkbox" name="rordb_create_hidden" value="" <?php if($items[12]=='1') echo "checked"; ?>></td>
                     </tr>
 
                     <tr>

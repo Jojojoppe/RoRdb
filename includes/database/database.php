@@ -1,7 +1,5 @@
 <?php
 
-//TODO create database share everybody with link!!! WHEN ADDING IMAGES
-
 class RordbDatabase{
 
 	public $api;
