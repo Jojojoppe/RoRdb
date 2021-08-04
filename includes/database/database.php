@@ -288,7 +288,7 @@ class RordbDatabase{
 				[$name, $parent]
 			], false);	
 
-			// Todo change name of category of items placed in this category
+			// Change name of category of items placed in this category
 			$query = "select * where C='".$categories_flat[$id]['name']."'";
 			$ret = $this->db_query($query, "Items");
 			foreach($ret as $i){
@@ -321,7 +321,15 @@ class RordbDatabase{
 				["", "", "", "", "", "", "", "", ""]
 			], false);	
 
-			// TODO update items in this category
+			// Update items in this category to None
+			$query = "select * where C='".$categories_flat[$id]['name']."'";
+			$ret = $this->db_query($query, "Items");
+			foreach($ret as $i){
+				$range = "C".($i[0]+2);
+				$this->api->sheets_put_range($this->sheet, "Items", $range, [
+					["None"]
+				], false);
+			}
 
 		}catch(Exception $e){
 			$this->error(__FUNCTION__.": ".$e->getMessage());
@@ -437,7 +445,7 @@ class RordbDatabase{
 				[$name, $parent]
 			], false);	
 
-			// Todo change name of location of items placed in this location
+			// Change name of location of items placed in this location
 			$query = "select * where D='".$locations_flat[$id]['name']."'";
 			$ret = $this->db_query($query, "Items");
 			foreach($ret as $i){
@@ -469,6 +477,17 @@ class RordbDatabase{
 			$this->api->sheets_put_range($this->sheet, "Locations", $range, [
 				["", "", "", "", "", "", "", "", ""]
 			], false);	
+
+			// Put items in location to None
+			$query = "select * where D='".$locations_flat[$id]['name']."'";
+			$ret = $this->db_query($query, "Items");
+			foreach($ret as $i){
+				$range = "D".($i[0]+2);
+				$this->api->sheets_put_range($this->sheet, "Items", $range, [
+					["None"]
+				], false);
+			}
+
 		}catch(Exception $e){
 			$this->error(__FUNCTION__.": ".$e->getMessage());
 		}
