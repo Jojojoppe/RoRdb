@@ -184,11 +184,22 @@ class RordbDatabase{
 
 	function put_category($name, $parent){
 		try{
+
+			// See if empty slots can be used
+			$query = "select * where B=''";
+			$ret = $this->db_query($query, "Categories");
+
 			// Get ID of next category
-			$next_id = $this->api->sheets_get_range($this->sheet, "Info", "B1")[0][0];
+			if(sizeof($ret)>0){
+				$next_id = $ret[0][0];
+			}else{
+				$next_id = $this->api->sheets_get_range($this->sheet, "Info", "B1")[0][0];
+			}
+
 			$row = $next_id+2;
 			// Get start cell of new row
 			$range = "A".$row;
+
 			// Put into sheet
 			$this->api->sheets_put_range($this->sheet, "Categories", $range, [
 				[$next_id, $name, $parent,
@@ -341,11 +352,22 @@ class RordbDatabase{
 
 	function put_location($name, $parent){
 		try{
-			// Get ID of next location
-			$next_id = $this->api->sheets_get_range($this->sheet, "Info", "B2")[0][0];
+
+			// See if empty slots can be used
+			$query = "select * where B=''";
+			$ret = $this->db_query($query, "Locations");
+
+			// Get ID of next category
+			if(sizeof($ret)>0){
+				$next_id = $ret[0][0];
+			}else{
+				$next_id = $this->api->sheets_get_range($this->sheet, "Info", "B2")[0][0];
+			}
+
 			$row = $next_id+2;
 			// Get start cell of new row
 			$range = "A".$row;
+
 			// Put into sheet
 			$this->api->sheets_put_range($this->sheet, "Locations", $range, [
 				[$next_id, $name, $parent,
