@@ -1,5 +1,7 @@
 <?php
 
+require_once('locations.php');
+
 function rordb_locations_options_menu(){
 	add_submenu_page(
         "rordb",                                // parent slug
@@ -13,140 +15,47 @@ function rordb_locations_options_menu(){
 }
 add_action('admin_menu', 'rordb_locations_options_menu');
 
-
 function rordb_locations_options_page_html(){
-	if(!rordb_can_user_edit_locations()){
-        add_settings_error('rordb_messages', 'rordb_message',
-            __('You do not have permission to view this page', 'rordb'), 'error');
-        settings_errors('rordb_messages'); 
-		return;
-	}
-    // Create database object to interact with
+    // Check for correct database and permissions
+    if(!rordb_locations_can_edit()) return;
+    // Initialize database component
     $db = new RordbDatabase();
-
-    // Check if valid database is loaded
-    if(!get_option("rordb_valid_database")){
-        add_settings_error('rordb_messages', 'rordb_message',
-            __('No valid database loaded', 'rordb'), 'error');
-        settings_errors('rordb_messages');   
-        return;
-    }
-
-    if(isset($_POST["rordb_create_name"])){
-        $db->put_location($_POST["rordb_create_name"], $_POST["rordb_create_parent"]);
-        add_settings_error('rordb_messages', 'rordb_message',
-            __('Added location \''.$_POST["rordb_create_name"].'\'', 'rordb'), 'updated');
-    }
-
-    if(isset($_POST["rordb_edit_name"])){
-        // Check if must delete
-        if(isset($_POST["rordb_edit_delete"]) and $_POST["rordb_edit_delete"]==true){
-            $db->delete_location($_POST["rordb_edit_id"]);
-            add_settings_error('rordb_messages', 'rordb_message',
-                __('Deleted location \''.$_POST["rordb_edit_name"].'\'', 'rordb'), 'updated');
-        }else{
-            $db->update_location($_POST["rordb_edit_id"], $_POST["rordb_edit_name"], $_POST["rordb_edit_parent"]);
-            add_settings_error('rordb_messages', 'rordb_message',
-                __('Edited location \''.$_POST["rordb_edit_name"].'\'', 'rordb'), 'updated');
-        }
-    }
-
-	// Show error/update messages
+    // Do edit/create actions
+    rordb_locations_do_action($_POST, $db);
+    // Show messages
 	settings_errors('rordb_messages');   
-
+    // Render page
     ?>
     <div class="wrap">
-		<h1><?php echo esc_html(get_admin_page_title()); ?></h1>
-
+        <h1><?php echo esc_html(get_admin_page_title()); ?></h1>
         <?php
-            if(isset($_GET["rordb_edit"])){
-                $location = $db->get_location($_GET["rordb_edit"]);
-                $currentcatid = $location["id"];
-                $currentcatname = $location["name"];
-                unset($_GET["rordb_edit"]);
-                $action_url = http_build_query($_GET);
-                ?>
-                <hr>
-                <h3>Edit a location</h3>
-                <form action="?<?php echo $action_url; ?>" method="post">
-                    <input type="hidden" name="rordb_edit_id" value="<?php echo $currentcatid; ?>">
-                    <table class="form-table" role="presentation"><tbody>
-                        <tr>
-                            <th scope="row">Location name</th>
-                            <td><input type="text" name="rordb_edit_name" value="<?php echo $currentcatname; ?>"></td>
-                        </tr>
-                        <tr>
-                            <th scope="row">Location parent</th>
-                            <td>
-                                <select name="rordb_edit_parent">
-                                <?php 
-                                    $db->locations_execute_recursive(function($c, $lvl, $location){
-                                        $name = $c["name"];
-                                        $id = $c["id"];
-                                        // Check if circular dependency will occur if this is set as parent
-                                        if(in_array($location['id'], $c['parents'])) return;
-                                        $indent = str_repeat("----", $lvl);
-                                        echo "<option value='".$name."' ";
-                                        if($id==$location["parentid"]) echo "selected";
-                                        echo ">".$indent.$name."</option>";
-                                    }, $location);
-                                ?>
-                            </td>
-                        </tr>
-                        <tr>
-                            <th scope="row"> Delete location</th>
-                            <td><input type="checkbox" name="rordb_edit_delete"></td>
-                        </tr>
-                    </tbody></table>
-                    <p class="submit"><input type="submit" value="Update location" class="button button-primary"></p>
-                </form>
-                <?php
+
+            if(rordb_locations_if_editing($_GET)){
+                rordb_locations_render_edit($db, $_GET);
                 return;
+            }else{
+                rordb_locations_render_create($db);
             }
 
-                ?>
+        ?>
         <hr>
-        <h3>Create a location</h3>
-        <form action="" method="post">
-            <table class="form-table" role="presentation"><tbody>
-                <tr>
-                    <th scope="row">Location name</th>
-                    <td><input type="text" name="rordb_create_name" value=""></td>
-                </tr>
-                <tr>
-                    <th scope="row">Location parent</th>
-                    <td>
-                        <select name="rordb_create_parent" value="">
-                        <?php 
-                            $db->locations_execute_recursive(function($c, $lvl, $p){
-                                $name = $c["name"];
-                                $id = $c["id"];
-                                $indent = str_repeat("----", $lvl);
-                                echo "<option value='".$name."'>".$indent.$name."</option>";
-                            });
-                        ?>
-                    </td>
-                </tr>
-            </tbody></table>
-            <p class="submit"><input type="submit" value="Create location" class="button button-primary"></p>
-        </form>
-
-        <hr>
-        <h3>List of locations</h3>
+        <h3>List of Locations</h3>
         <?php
+
             // List the locations
             $db->locations_execute_recursive(function($c, $lvl, $p){
                 $name = $c["name"];
                 $id = $c["id"];
-                $indent = str_repeat("----", $lvl);
+                $indent = str_repeat('----', $lvl);
                 echo $indent."+ ".$name;
-                if($c["id"]!=0 && $c["id"]!=1){
+                if(rordb_locations_can_edit_location($id)){
                     echo " <a href='?";
-                    echo http_build_query(array_merge($_GET, array("rordb_edit"=>$id)));
+                    echo rordb_locations_get_edit_url($_GET, $id);
                     echo "'>edit</a>";
                 }
                 echo "<br>";
             });
+
         ?>
     </div>
     <?php
