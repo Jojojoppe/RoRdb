@@ -7,7 +7,7 @@ License: BSD-2
 Author: Joppe Blondel
 Author URI: https://github.com/Jojojoppe
 Description: Room of Requirements (RoR) database using Google drive and sheets
-Requires PHP: 8
+Requires PHP: 7
 
 Copyright (c) 2021, Joppe Blondel
 
