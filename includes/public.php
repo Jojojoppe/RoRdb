@@ -3,11 +3,13 @@
 function rordb_public_render_menu(){
     $ret = "";
 
+    $pageid = $_GET['page_id'];
+
     // Menu bar
     $ret .= "<table width='100%'><tr>";
-    $ret .= "<td><a href='?".http_build_query(array_merge($_GET, ["rordb_action"=>"home"]))."'>Home</a></td>";
-    $ret .= "<td><a href='?".http_build_query(array_merge($_GET, ["rordb_action"=>"categories"]))."'>Categories</a></td>";
-    $ret .= "<td><a href='?".http_build_query(array_merge($_GET, ["rordb_action"=>"locations"]))."'>Locations</a></td>";
+    $ret .= "<td><a href='?page_id=".$pageid."&rordb_action=home'>Home</a></td>";
+    $ret .= "<td><a href='?page_id=".$pageid."&rordb_action=categories'>Categories</a></td>";
+    $ret .= "<td><a href='?page_id=".$pageid."&rordb_action=locations'>Locations</a></td>";
     $ret .= "</tr></table>";
 
     return $ret;
@@ -28,8 +30,7 @@ function rordb_public_render_sidebar(){
         $ret .= rordb_public_categories_sidebar();
 
     }elseif($action=="locations"){
-        // Locations page
-        $ret .= "Locations page for RoRdb";
+        $ret .= rordb_public_locations_sidebar();
 
     }else{
         // Unknown page
@@ -54,8 +55,7 @@ function rordb_public_render_main(){
         $ret .= rordb_public_categories_main();
 
     }elseif($action=="locations"){
-        // Locations page
-        $ret .= "Locations page for RoRdb";
+        $ret .= rordb_public_locations_main();
 
     }else{
         // Unknown page

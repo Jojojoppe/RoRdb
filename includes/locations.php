@@ -21,20 +21,14 @@ function rordb_locations_can_edit(){
 function rordb_locations_do_action($POST, $db){
     if(isset($POST["rordb_create_name"])){
         $db->put_location($POST["rordb_create_name"], $POST["rordb_create_parent"]);
-        add_settings_error('rordb_messages', 'rordb_message',
-            __('Added location \''.$POST["rordb_create_name"].'\'', 'rordb'), 'updated');
     }
 
     if(isset($POST["rordb_edit_name"])){
         // Check if must delete
         if(isset($POST["rordb_edit_delete"]) and $POST["rordb_edit_delete"]==true){
             $db->delete_location($POST["rordb_edit_id"]);
-            add_settings_error('rordb_messages', 'rordb_message',
-                __('Deleted location \''.$POST["rordb_edit_name"].'\'', 'rordb'), 'updated');
         }else{
             $db->update_location($POST["rordb_edit_id"], $POST["rordb_edit_name"], $POST["rordb_edit_parent"]);
-            add_settings_error('rordb_messages', 'rordb_message',
-                __('Edited location \''.$POST["rordb_edit_name"].'\'', 'rordb'), 'updated');
         }
     }
 }
