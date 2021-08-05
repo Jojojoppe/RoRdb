@@ -64,15 +64,13 @@ function rordb_public_locations_main(){
             <h5>Edit a location</h5>
             <form action="?'.$action_url.'" method="post">
                 <input type="hidden" name="rordb_edit_id" value="'.$currentcatid.'">
-                <table class="form-table" role="presentation"><tbody>
-                    <tr>
-                        <th scope="row">Location name</th>
-                        <td><input type="text" name="rordb_edit_name" value="'.$currentcatname.'"></td>
-                    </tr>
-                    <tr>
-                        <th scope="row">Location parent</th>
-                        <td>
-                            <select name="rordb_edit_parent">
+                <p>
+                    <label>Location name</label>
+                    <input type="text" name="rordb_edit_name" value="'.$currentcatname.'">
+                </p>
+                <p>
+                    <label>Location parent</label>
+                    <select name="rordb_edit_parent">
         ';
 
         $db->locations_execute_recursive(function($c, $lvl, $category, &$ret){
@@ -88,13 +86,13 @@ function rordb_public_locations_main(){
         }, $category, $ret);
 
         $ret .= '
-                        </td>
-                    </tr>
-                    <tr>
-                        <th scope="row"> Delete location</th>
-                        <td><input type="checkbox" name="rordb_edit_delete"></td>
-                    </tr>
-                </tbody></table>
+                    </select>
+                </p>
+                <p>
+                    <label>Delete location</label>
+                    <input type="checkbox" name="rordb_edit_delete">
+                </p>
+                <br
                 <p class="submit"><input type="submit" value="Update location" class="button button-primary"></p>
             </form>
         ';
@@ -103,15 +101,13 @@ function rordb_public_locations_main(){
         $ret .= '
             <h5>Create a Location</h5>
             <form action="" method="post">
-                <table class="form-table" role="presentation"><tbody>
-                    <tr>
-                        <th scope="row">Location name</th>
-                        <td><input type="text" name="rordb_create_name" value=""></td>
-                    </tr>
-                    <tr>
-                        <th scope="row">Location parent</th>
-                        <td>
-                            <select name="rordb_create_parent" value="">
+                <p>
+                    <label>Location name</label>
+                    <input type="text" name="rordb_create_name" value="">
+                </p>
+                <p>
+                    <label>Location parent</label>
+                    <select name="rordb_create_parent" value="">
         ';
 
         $db->locations_execute_recursive(function($c, $lvl, &$ret){
@@ -122,9 +118,9 @@ function rordb_public_locations_main(){
         }, $ret);
 
         $ret .= '
-                        </td>
-                    </tr>
-                </tbody></table>
+                    </select>
+                </p>
+                <br>
                 <p class="submit"><input type="submit" value="Create location" class="button button-primary"></p>
             </form>
         ';

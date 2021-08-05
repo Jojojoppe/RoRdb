@@ -20,7 +20,7 @@ function rordb_public_home_sidebar(){
 
     $ret .= "<input type='checkbox' disabled";
     if(rordb_can_user_edit_locations()) $ret .= " checked";
-    $ret .= "> Edit RoRdb locationstems<br>";
+    $ret .= "> Edit RoRdb locations<br>";
 
     $ret .= "<input type='checkbox' disabled";
     if(rordb_can_user_edit_items()) $ret .= " checked";
