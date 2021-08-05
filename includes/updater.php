@@ -98,7 +98,7 @@ class RoRdbGithubUpdater{
         // Add our plugin information
         $response->last_updated = $this->githubAPIResult->published_at;
         $response->slug = $this->slug;
-        $response->plugin_name  = $this->pluginData["Name"];
+        $response->name  = $this->pluginData["Name"];
         $response->version = $this->githubAPIResult->tag_name;
         $response->author = $this->pluginData["AuthorName"];
         $response->homepage = $this->pluginData["PluginURI"];
