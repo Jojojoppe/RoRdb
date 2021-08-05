@@ -50,7 +50,10 @@ function rordb_public_items_main(){
 
     $ret .= "<h2>Items</h2>";
 
-    if(!isset($_POST['rordb_searchtag'])) return $ret;
+    if(!isset($_POST['rordb_searchtag'])){
+        $ret .= "No search word is entered. Search on empty string to show all items";
+        return $ret;
+    }
 
     // Perform search
     $db = new RordbDatabase();
@@ -64,6 +67,8 @@ function rordb_public_items_main(){
                 $ret .= "<img height='100%' src='https://drive.google.com/thumbnail?id=".$i[10]."&sz=w200-h200'>";
             $ret .= "</div>";
             $ret .= "<div class='wp-block-column' style='flex-basis:50%;'>";
+                        $pageid = $_GET['page_id'];
+                        $ret .= "<a href='?page_id=".$pageid."&rordb_action=edititem&rordb_edit_item=".$i[0]."'>Edit item</a><br>";
                         $ret .= "Name: " . $i[1] . "<br>";
                         $ret .= "Category: " . $i[2] . "<br>";
                         $ret .= "Location: " . $i[3] . "<br>";

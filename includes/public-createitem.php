@@ -52,7 +52,7 @@ function rordb_public_createitem_main(){
     }
 
     $ret .= '
-        <b>Create item</b><br>
+        <h2>Create item</h2><br>
         <form acttion="" method="post">
             <p>
                 <label>Item name</label>

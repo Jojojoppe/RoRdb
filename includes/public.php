@@ -39,6 +39,9 @@ function rordb_public_render_sidebar(){
     }elseif($action=="createitem"){
         $ret .= rordb_public_createitem_sidebar();
 
+    }elseif($action=="edititem"){
+        $ret .= rordb_public_edititem_sidebar();
+
     }else{
         // Unknown page
         $ret .= "Unkown action!";
@@ -69,6 +72,9 @@ function rordb_public_render_main(){
 
     }elseif($action=="createitem"){
         $ret .= rordb_public_createitem_main();
+
+    }elseif($action=="edititem"){
+        $ret .= rordb_public_edititem_main();
 
     }else{
         // Unknown page

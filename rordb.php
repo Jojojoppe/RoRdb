@@ -65,6 +65,7 @@ require_once plugin_dir_path(__FILE__)."includes/public-categories.php";
 require_once plugin_dir_path(__FILE__)."includes/public-locations.php";
 require_once plugin_dir_path(__FILE__)."includes/public-items.php";
 require_once plugin_dir_path(__FILE__)."includes/public-createitem.php";
+require_once plugin_dir_path(__FILE__)."includes/public-edititem.php";
 
 // Shortcode parser
 require_once plugin_dir_path(__FILE__)."includes/public-shortcodes.php";
