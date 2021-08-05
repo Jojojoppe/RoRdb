@@ -2,7 +2,7 @@
 /*
 Plugin Name: RoRdb
 Plugin URI: https://github.com/Jojojoppe/RoRdb
-Version: 0.0.4
+Version: 0.0.5
 License: BSD-2
 Author: Joppe Blondel
 Author URI: https://github.com/Jojojoppe
@@ -36,7 +36,7 @@ if(!defined('WPINC')){
 	die;
 }
 
-define("RORDB_VERSION", "0.0.4");
+define("RORDB_VERSION", "0.0.5");
 
 // Google stuff
 require_once plugin_dir_path(__FILE__)."third_party/google-api-php-client--PHP8.0/vendor/autoload.php";
@@ -73,7 +73,20 @@ require_once plugin_dir_path(__FILE__)."includes/updater.php";
 
 // Update hook
 if(is_admin()){
-   new RoRdbGithubUpdater(__FILE__, "Jojojoppe", "RoRdb");
+   $config = array(
+      'slug' => plugin_basename(__FILE__), // this is the slug of your plugin
+      'proper_folder_name' => 'RoRdb', // this is the name of the folder your plugin lives in
+      'api_url' => 'https://api.github.com/repos/Jojojoppe/RoRdb', // the GitHub API url of your GitHub repo
+      'raw_url' => 'https://raw.github.com/Jojojoppe/RoRdb/master', // the GitHub raw url of your GitHub repo
+      'github_url' => 'https://github.com/Jojojoppe/RoRdb', // the GitHub url of your GitHub repo
+      'zip_url' => 'https://github.com/Jojojoppe/RoRdbe/zipball/master', // the zip url of the GitHub repo
+      'sslverify' => true, // whether WP should check the validity of the SSL cert when getting an update, see https://github.com/jkudish/WordPress-GitHub-Plugin-Updater/issues/2 and https://github.com/jkudish/WordPress-GitHub-Plugin-Updater/issues/4 for details
+      'requires' => '3.0', // which version of WordPress does your plugin require?
+      'tested' => '3.3', // which version of WordPress is your plugin tested up to?
+      'readme' => 'README.MD', // which file to use as the readme for the version number
+      'access_token' => '', // Access private repositories by authorizing under Plugins > GitHub Updates when this example plugin is installed
+   );
+   new WP_GitHub_Updater($config);
 }
 
 // Activation hook
