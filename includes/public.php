@@ -8,9 +8,9 @@ function rordb_public_render_menu(){
     // Menu bar
     $ret .= "<table width='100%'><tr>";
     $ret .= "<td><a href='?page_id=".$pageid."&rordb_action=home'>Home</a></td>";
+    $ret .= "<td><a href='?page_id=".$pageid."&rordb_action=items'>Items</a></td>";
     $ret .= "<td><a href='?page_id=".$pageid."&rordb_action=categories'>Categories</a></td>";
     $ret .= "<td><a href='?page_id=".$pageid."&rordb_action=locations'>Locations</a></td>";
-    $ret .= "<td><a href='?page_id=".$pageid."&rordb_action=items'>Items</a></td>";
     $ret .= "</tr></table>";
 
     return $ret;
@@ -35,6 +35,9 @@ function rordb_public_render_sidebar(){
 
     }elseif($action=="items"){
         $ret .= rordb_public_items_sidebar();
+
+    }elseif($action=="createitem"){
+        $ret .= rordb_public_createitem_sidebar();
 
     }else{
         // Unknown page
@@ -63,6 +66,9 @@ function rordb_public_render_main(){
 
     }elseif($action=="items"){
         $ret .= rordb_public_items_main();
+
+    }elseif($action=="createitem"){
+        $ret .= rordb_public_createitem_main();
 
     }else{
         // Unknown page

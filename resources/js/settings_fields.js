@@ -60,7 +60,7 @@ function rordb_put_imgcontent_in_img(fid, iid, did){
     var reader = new FileReader();
     reader.onload = function(e){
         // var content = e.target.result;
-        var content = rordb_downscaleImage_and_put_imgcontent(e.srcElement.result, 200, iid, did);
+        var content = rordb_downscaleImage_and_put_imgcontent(e.srcElement.result, 500, iid, did);
     };
     reader.readAsDataURL(file);
 }
