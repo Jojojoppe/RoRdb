@@ -92,6 +92,11 @@ function rordb_options_page_html(){
 			submit_button('Save settings');
 			?>
 		</form>
-	</div>
-	<?php
+
+		<hr>
+		<h2>Licence</h2>
+		<?php
+			echo "<pre>".file_get_contents(plugin_dir_path(__FILE__)."/../LICENCE")."</pre>";
+
+	echo "</div>";
 }

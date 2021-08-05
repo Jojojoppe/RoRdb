@@ -679,7 +679,7 @@ class RordbDatabase{
 	// Helper functions
 	// ----------------
 
-	function generate_tree_categories_locations($childlist, $id){
+	function generate_tree_categories_locations(&$childlist, $id){
 		$ret = [
 			"id" => $id,
 			"name" => $childlist[$id]["name"],
@@ -695,28 +695,28 @@ class RordbDatabase{
 		return $ret;
 	}
 
-	function execute_recursive_($cats, $level, $func, $e){
+	function execute_recursive_(&$cats, $level, $func, &$e, &$e2){
 		foreach($cats as $c){
-			$func($c, $level, $e);
-			$this->execute_recursive_($c["childs"], $level+1, $func, $e);
+			$func($c, $level, $e, $e2);
+			$this->execute_recursive_($c["childs"], $level+1, $func, $e, $e2);
 		}
 	}
 
 	// Traverses the categories recursively and calls func($category, $level)
-	function categories_execute_recursive($func, $e=null){
+	function categories_execute_recursive($func, &$e=null, &$e2=null){
 		try{
 			$categories = $this->get_categories()[0];
-			$this->execute_recursive_($categories, 0, $func, $e);
+			$this->execute_recursive_($categories, 0, $func, $e, $e2);
 		}catch(Exception $e){
 			$this->error(__FUNCTION__.": ".$e->getMessage());
 		}
 	}
 
 	// Traverses the locations recursively and calls func($location, $level)
-	function locations_execute_recursive($func, $e=null){
+	function locations_execute_recursive($func, &$e=null, &$e2=null){
 		try{
 			$locations = $this->get_locations()[0];
-			$this->execute_recursive_($locations, 0, $func, $e);
+			$this->execute_recursive_($locations, 0, $func, $e, $e2);
 		}catch(Exception $e){
 			$this->error(__FUNCTION__.": ".$e->getMessage());
 		}
