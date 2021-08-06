@@ -1,17 +1,25 @@
 <?php
 
-function rordb_public_render_menu(){
+function rordb_public_render_menu($button_class){
     $ret = "";
 
-    $pageid = $_GET['page_id'];
+    $pageid = "";
+    if(isset($_GET['page_id'])) $pageid = $_GET['page_id'];
+
+    function add_button($href, $title, $button_class){
+        $ret = "<a href='".$href."' >";
+        $ret .= "<div class='".$button_class."'>";
+        $ret .= $title;
+        $ret .= "</div></a>";
+        return $ret;
+    }
 
     // Menu bar
-    $ret .= "<table width='100%'><tr>";
-    $ret .= "<td><a href='?page_id=".$pageid."&rordb_action=home'>Home</a></td>";
-    $ret .= "<td><a href='?page_id=".$pageid."&rordb_action=items'>Items</a></td>";
-    $ret .= "<td><a href='?page_id=".$pageid."&rordb_action=categories'>Categories</a></td>";
-    $ret .= "<td><a href='?page_id=".$pageid."&rordb_action=locations'>Locations</a></td>";
-    $ret .= "</tr></table>";
+    $ret .= add_button("?page_id=".$pageid."&rordb_action=home", "Home", $button_class);
+    $ret .= add_button("?page_id=".$pageid."&rordb_action=items", "Items", $button_class);
+    $ret .= add_button("?page_id=".$pageid."&rordb_action=categories", "Categories", $button_class);
+    $ret .= add_button("?page_id=".$pageid."&rordb_action=locations", "Locations", $button_class);
+
 
     return $ret;
 }

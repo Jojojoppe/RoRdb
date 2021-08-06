@@ -1,7 +1,10 @@
 <?php
 
 function rordb_shortcode_menu($atts=[], $content=null){
-    return rordb_public_render_menu();
+    // parse options
+    if(!array_key_exists('button_class', $atts)) $atts['button_class'] = '';
+
+    return rordb_public_render_menu($atts['button_class']);
 }
 add_shortcode('rordb_menu', 'rordb_shortcode_menu');
 
