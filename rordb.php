@@ -54,7 +54,6 @@ require_once plugin_dir_path(__FILE__)."includes/settings.php";
 require_once plugin_dir_path(__FILE__)."includes/users.php";
 
 // Functionality wrappers
-require_once plugin_dir_path(__FILE__)."includes/categories.php";
 require_once plugin_dir_path(__FILE__)."includes/locations.php";
 
 // Admin pages

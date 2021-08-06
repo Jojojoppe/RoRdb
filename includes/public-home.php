@@ -7,18 +7,34 @@ function rordb_public_home_sidebar(){
     $ret .= "You're currently logged in and have the following permissions:<br>";
 
     $ret .= "<input type='checkbox' disabled";
-    if(rordb_can_user_view()) $ret .= " checked";
+    if(rordb_can_user_edit_items()) $ret .= " checked";
+    $ret .= "> Edit RoRdb items<br>";
+
+    $ret .= "<input type='checkbox' disabled";
+    if(rordb_can_user_view_items()) $ret .= " checked";
     $ret .= "> View RoRdb items<br>";
 
     $ret .= "<input type='checkbox' disabled";
     if(rordb_can_user_create_items()) $ret .= " checked";
     $ret .= "> Create RoRdb items<br>";
 
+    $ret .= "<input type='checkbox' disabled";
+    if(rordb_can_user_edit_items()) $ret .= " checked";
+    $ret .= "> Edit RoRdb items<br>";
+
+    $ret .= "<input type='checkbox' disabled";
+    if(rordb_can_user_view_categories()) $ret .= " checked";
+    $ret .= "> View RoRdb categories<br>";
+
+    $ret .= "<input type='checkbox' disabled";
+    if(rordb_can_user_create_categories()) $ret .= " checked";
+    $ret .= "> Create RoRdb categories<br>";
+
+    $ret .= "<input type='checkbox' disabled";
+    if(rordb_can_user_edit_categories()) $ret .= " checked";
+    $ret .= "> Edit RoRdb categories<br>";
 
 
-    // $ret .= "<input type='checkbox' disabled";
-    // if(rordb_can_user_edit_items()) $ret .= " checked";
-    // $ret .= "> Edit RoRdb items<br>";
 
     // $ret .= "<input type='checkbox' disabled";
     // if(rordb_can_user_edit_settings()) $ret .= " checked";

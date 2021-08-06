@@ -3,15 +3,16 @@
 function rordb_public_items_sidebar(){
     $ret = "";
 
-    // Check if right permissions
-    if(!rordb_can_user_view()){
-        $ret .= "<i>ERROR: You dont have permission to view RoRdb items!</i>";
-        return $ret;
-    }
-    // Check if valid database is loaded
+    // Check for valid database
     if(!get_option("rordb_valid_database")){
-        $ret .= "<i>ERROR: No valid database is loaded. Contact the dotCom!</i>";
-        return $ret;
+        rordb_error("No valid database is loaded", "error");
+        return rordb_show_errors();
+    }
+
+    // CHeck for right permissions
+    if(!rordb_can_user_view_items()){
+        rordb_error("You don't have permission to view items", "error");
+        return rordb_show_errors();
     }
 
     // Show search field
@@ -37,16 +38,18 @@ function rordb_public_items_sidebar(){
 function rordb_public_items_main(){
     $ret = "";
 
-    // Check if right permissions
-    if(!rordb_can_user_view()){
-        $ret .= "<i>ERROR: You dont have permission to view RoRdb items!</i>";
-        return $ret;
-    }
-    // Check if valid database is loaded
+    // Check for valid database
     if(!get_option("rordb_valid_database")){
-        $ret .= "<i>ERROR: No valid database is loaded. Contact the dotCom!</i>";
-        return $ret;
+        rordb_error("No valid database is loaded", "error");
+        return rordb_show_errors();
     }
+
+    // CHeck for right permissions
+    if(!rordb_can_user_view_items()){
+        rordb_error("You don't have permission to view items", "error");
+        return rordb_show_errors();
+    }
+
 
     $ret .= "<h2>Items</h2>";
 
@@ -57,9 +60,12 @@ function rordb_public_items_main(){
 
     // Perform search
     $db = new RordbDatabase();
+
+    // Perform search
     $searchresults = $db->items_search($_POST['rordb_searchtag'], [], []);
 
-    // $ret .= "<pre>".var_export($searchresults, true)."</pre>";
+    // Show errors if needed
+    $ret .= rordb_show_errors();
 
     foreach($searchresults as $i){
         $ret .= "<div class='wp-block-columns' style='background-color:#d6c2d6'>";
