@@ -51,12 +51,12 @@ require_once plugin_dir_path(__FILE__)."includes/settings.php";
 // Users
 require_once plugin_dir_path(__FILE__)."includes/users.php";
 
+// Functionality wrappers
+require_once plugin_dir_path(__FILE__)."includes/categories.php";
+require_once plugin_dir_path(__FILE__)."includes/locations.php";
+
 // Admin pages
-require_once plugin_dir_path(__FILE__)."includes/admin-page.php";
 require_once plugin_dir_path(__FILE__)."includes/admin-settings.php";
-require_once plugin_dir_path(__FILE__)."includes/admin-categories.php";
-require_once plugin_dir_path(__FILE__)."includes/admin-locations.php";
-require_once plugin_dir_path(__FILE__)."includes/admin-create_items.php";
 
 // Public pages
 require_once plugin_dir_path(__FILE__)."includes/public.php";
@@ -77,11 +77,11 @@ require_once plugin_dir_path(__FILE__)."includes/updater.php";
 if(is_admin()){
    $config = array(
       'slug' => plugin_basename(__FILE__), // this is the slug of your plugin
-      'proper_folder_name' => 'RoRdb', // this is the name of the folder your plugin lives in
+      'proper_folder_name' => basename(plugin_dir_path(__FILE__)), // this is the name of the folder your plugin lives in
       'api_url' => 'https://api.github.com/repos/Jojojoppe/RoRdb', // the GitHub API url of your GitHub repo
       'raw_url' => 'https://raw.github.com/Jojojoppe/RoRdb/master', // the GitHub raw url of your GitHub repo
       'github_url' => 'https://github.com/Jojojoppe/RoRdb', // the GitHub url of your GitHub repo
-      'zip_url' => 'https://github.com/Jojojoppe/RoRdbe/zipball/master', // the zip url of the GitHub repo
+      'zip_url' => 'https://github.com/Jojojoppe/RoRdb/zipball/master', // the zip url of the GitHub repo
       'sslverify' => true, // whether WP should check the validity of the SSL cert when getting an update, see https://github.com/jkudish/WordPress-GitHub-Plugin-Updater/issues/2 and https://github.com/jkudish/WordPress-GitHub-Plugin-Updater/issues/4 for details
       'requires' => '5.7', // which version of WordPress does your plugin require?
       'tested' => '5.7', // which version of WordPress is your plugin tested up to?

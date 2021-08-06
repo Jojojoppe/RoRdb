@@ -1,17 +1,30 @@
 <?php
 
-function rordb_create_options_menu(){
-	add_submenu_page(
-        "rordb",                                // parent slug
-        "Settings",   		                    // page title
-        "Settings",                             // menu title
-        "read",                                 // capability
-        "rordb_settings",	                    // menu slug
-        "rordb_options_page_html"  				// callable
-        // position
-    );
+// function rordb_create_options_menu(){
+// 	add_submenu_page(
+//         "rordb",                                // parent slug
+//         "Settings",   		                    // page title
+//         "Settings",                             // menu title
+//         "read",                                 // capability
+//         "rordb_settings",	                    // menu slug
+//         "rordb_options_page_html"  				// callable
+//         // position
+//     );
+// }
+// add_action('admin_menu', 'rordb_create_options_menu');
+
+function rordb_admin_menu(){
+	add_menu_page(
+		"RoRdb settings", 				// page title
+		"RoRdb",      	 				// menu title
+		"read", 						// capability
+		"rordb", 						// menu slug
+		"rordb_options_page_html",		// callable
+		file_get_contents(plugin_dir_path(__FILE__)."../resources/images/nest_icon.wpico") // icon url
+		// position
+	);
 }
-add_action('admin_menu', 'rordb_create_options_menu');
+add_action('admin_menu', 'rordb_admin_menu');
 
 function rordb_options_page_html(){
 	if(!rordb_can_user_edit_settings()){
