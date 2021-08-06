@@ -2,7 +2,7 @@
 /*
 Plugin Name: RoRdb
 Plugin URI: https://github.com/Jojojoppe/RoRdb
-Version: 0.0.6-a
+Version: 0.0.7
 License: BSD-2
 Author: Joppe Blondel
 Author URI: https://github.com/Jojojoppe
@@ -36,13 +36,15 @@ if(!defined('WPINC')){
 	die;
 }
 
-define("RORDB_VERSION", "0.0.6-a");
+define("RORDB_VERSION", "0.0.7");
 
 // Google stuff
 require_once plugin_dir_path(__FILE__)."third_party/google-api-php-client--PHP8.0/vendor/autoload.php";
 require_once plugin_dir_path(__FILE__)."includes/googleapi/api.php";
 // RoRdb database interface
 require_once plugin_dir_path(__FILE__)."includes/database/database.php";
+
+require_once plugin_dir_path(__FILE__)."includes/error.php";
 
 // Settings
 require_once plugin_dir_path(__FILE__)."includes/settings_fields.php";

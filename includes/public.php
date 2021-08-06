@@ -1,25 +1,31 @@
 <?php
 
-function rordb_public_render_menu($button_class){
+function rordb_public_render_menu($button_class, $link_class){
     $ret = "";
 
     $pageid = "";
     if(isset($_GET['page_id'])) $pageid = $_GET['page_id'];
 
-    function add_button($href, $title, $button_class){
-        $ret = "<a href='".$href."' >";
+    function add_button($href, $title, $button_class, $link_class, $width){
+        $ret = "<div class='wp-block-column' style='flex-basis:".$width."'>";
+        $ret .= "<a href='".$href."' class='".$link_class."'>";
         $ret .= "<div class='".$button_class."'>";
         $ret .= $title;
-        $ret .= "</div></a>";
+        $ret .= "</div></a></div>";
         return $ret;
     }
 
     // Menu bar
-    $ret .= add_button("?page_id=".$pageid."&rordb_action=home", "Home", $button_class);
-    $ret .= add_button("?page_id=".$pageid."&rordb_action=items", "Items", $button_class);
-    $ret .= add_button("?page_id=".$pageid."&rordb_action=categories", "Categories", $button_class);
-    $ret .= add_button("?page_id=".$pageid."&rordb_action=locations", "Locations", $button_class);
+    $ret .= "<div class='wp-block-columns' width='100%'>";
+    $width = "25%";
+    $ret .= add_button("?page_id=".$pageid."&rordb_action=home", "Home", $button_class, $link_class, $width);
+    $ret .= add_button("?page_id=".$pageid."&rordb_action=items", "Items", $button_class, $link_class, $width);
+    $ret .= add_button("?page_id=".$pageid."&rordb_action=categories", "Categories", $button_class, $link_class, $width);
+    $ret .= add_button("?page_id=".$pageid."&rordb_action=locations", "Locations", $button_class, $link_class, $width);
+    $ret .= "</div>";
 
+    // Show error message is needed
+    $ret .= rordb_show_errors();
 
     return $ret;
 }
