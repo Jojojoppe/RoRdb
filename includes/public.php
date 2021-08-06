@@ -24,9 +24,6 @@ function rordb_public_render_menu($button_class, $link_class){
     $ret .= add_button("?page_id=".$pageid."&rordb_action=locations", "Locations", $button_class, $link_class, $width);
     $ret .= "</div>";
 
-    // Show error message is needed
-    $ret .= rordb_show_errors();
-
     return $ret;
 }
 

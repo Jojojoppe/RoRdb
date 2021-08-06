@@ -66,7 +66,7 @@ function rordb_field_checkbox($args){
 }
 function rordb_field_checkbox_disabled($args){
 	$option = get_option($args['label_for']);
-	echo "<input readonly type='checkbox' id='".esc_attr($args['label_for'])."' ";
+	echo "<input disabled type='checkbox' id='".esc_attr($args['label_for'])."' ";
 	echo "name='".esc_attr($args['label_for'])."' ";
 	if($option) echo "checked ";
 	echo "value='".$option."'>";

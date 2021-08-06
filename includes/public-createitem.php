@@ -12,25 +12,32 @@ function rordb_public_createitem_sidebar(){
 function rordb_public_createitem_main(){
     $ret = "";
 
-    // Check if right permissions
-	if(!rordb_can_user_edit_items()){
-        $ret .= "<i>ERROR: You dont have permission to edit RoRdb items!</i>";
-        return $ret;
-    }
-    // Check if valid database is loaded
+    // Check for valid database
     if(!get_option("rordb_valid_database")){
-        $ret .= "<i>ERROR: No valid database is loaded. Contact the dotCom!</i>";
-        return $ret;
+        rordb_error("No valid database is loaded", "error");
+        return rordb_show_errors();
     }
+
+    // CHeck for right permissions
+    if(!rordb_can_user_create_items()){
+        rordb_error("You don't have permission to create items", "error");
+        return rordb_show_errors();
+    }
+
+    // Load image compression and conversion script
+	wp_enqueue_script('rordb_public_items_js', plugin_dir_url(__FILE__)."../resources/js/settings_fields.js", array(), null, true);
 
     // Create database object to interact with
     $db = new RordbDatabase();
-	wp_enqueue_script('rordb_public_items_js', plugin_dir_url(__FILE__)."../resources/js/settings_fields.js", array(), null, true);
 
+    // Do actions if needed
+    // Check if item must be added to database
     if(isset($_POST["rordb_create_img"])){
         // Add item to database
         if($_POST["rordb_create_img"]!=""){
+            // Valid item addition
 
+            // Convert hidden field to right format
             if(!isset($_POST['rordb_create_hidden'])) $_POST['rordb_create_hidden'] = 0;
             elseif($_POST['rordb_create_hidden']=="off") $_POST['rordb_create_hidden'] = 0;
             else $_POST['rordb_create_hidden'] = 1;
@@ -46,86 +53,65 @@ function rordb_public_createitem_main(){
                 $fid,
                 $_POST['rordb_create_claimed'], $_POST['rordb_create_hidden']
             );
+
+            rordb_error("Item successfully added", "message");
         }else{
-            $ret .= "<i>ERROR: No image for item selected</i><br>";
+            // No image added
+            rordb_error("No image added", "error");
         }
     }
 
-    $ret .= '
-        <h2>Create item</h2><br>
-        <form acttion="" method="post">
-            <p>
-                <label>Item name</label>
-                <input type="text" name="rordb_create_name" value="">
-            </p>
-            <p>
-                <label>Category</label>
-                <select name="rordb_create_category" value="">
-    ';
+    // Show errors if needed
+    $ret .= rordb_show_errors();
+
+    // Render create item form
+
+    function add_field($field, $label){
+        $ret = "<p><label>".$label."<br><span class='wpcf7-form-control-wrap'>".$field."</p>";
+        return $ret;
+    }
+
+    $ret .= '<h2>Create item</h2><div role="form" class="wpcf7"><form acttion="" method="post" class="wpcf7">';
+
+    $ret .= add_field('<input type="text" name="rordb_create_name" class="wpcf7-form-control wpcf7-text">', "Category name");
+
+    $categories = '';
     $db->categories_execute_recursive(function($c, $lvl, &$p){
         $name = $c["name"];
         $id = $c["id"];
         $indent = str_repeat("----", $lvl);
         $p .= "<option value='".$name."'>".$indent.$name."</option>";
-    }, $ret);
-    $ret .= '
-                </select>
-            </p>
-            <p>
-                <label>Location</label>
-                <select name="rordb_create_location" value="">
-    ';
+    }, $categories);
+    $ret .= add_field('<select name="rordb_create_category">'.$categories.'</select>', 'Category');
+
+    $locations = '';
     $db->locations_execute_recursive(function($c, $lvl, &$p){
         $name = $c["name"];
         $id = $c["id"];
         $indent = str_repeat("----", $lvl);
         $p .= "<option value='".$name."'>".$indent.$name."</option>";
-    }, $ret);
-    $ret .= '
-                </select>
-            </p>
+    }, $locations);
+    $ret .= add_field('<select name="rordb_create_location">'.$locations.'</select>', 'Location');
 
-            <p>
-                <label>Color</label>
-                <input type="text" name="rordb_create_color" value="">
-            </p>
+    $ret .= add_field('<input type="text" name="rordb_create_color">', 'Color');
 
-            <p>
-                <label>Size</label>
-                <input type="text" name="rordb_create_size" value="">
-            </p>
+    $ret .= add_field('<input type="text" name="rordb_create_size">', 'Size');
 
-            <p>
-                <label>Amount</label>
-                <input type="text" name="rordb_create_amount" value="">
-            </p>
+    $ret .= add_field('<input type="text" name="rordb_create_amount">', 'Amount');
 
-            <p>
-                <label>Comments</label>
-                <textarea name="rordb_create_comments" value="" rows="10"></textarea>
-            </p>
+    $ret .= add_field('<textarea name="rordb_create_comments" rows="10"></textarea>', 'Comments');
 
-            <p>
-                <label>Claimed</label>
-                <input type="text" name="rordb_create_claimed" value="">
-            </p>
+    $ret .= add_field('<input type="text" name="rordb_create_claimed">', 'Claimed');
 
-            <p>
-                <label>Hidden</label>
-                <input type="checkbox" name="rordb_create_hidden" value="">
-            </p>
+    $ret .= add_field('<input type="checkbox" name="rordb_create_hidden">', "Hidden");
 
-            <p>
-                <label>Image</label>
+    $ret .= add_field('
+        <input type="hidden" name="rordb_create_img" id="rordb_create_img">
+        <img id="rordb_imgtest" width="200"><br>
+        <input type="file" accept="image/*" id="rordb_file_imgtest" onchange=\'javscript:rordb_put_imgcontent_in_img("rordb_file_imgtest", "rordb_imgtest", "rordb_create_img")\'>
+    ', "Image");
 
-                    <input type="hidden" name="rordb_create_img" id="rordb_create_img" value="">
-                    <img id="rordb_imgtest" width="200"><br>
-                    <input type="file" accept="image/*" id="rordb_file_imgtest" onchange=\'javscript:rordb_put_imgcontent_in_img("rordb_file_imgtest", "rordb_imgtest", "rordb_create_img")\'>
-            <p>
-
-        <p class="submit"><input type="submit" value="Create Item" class="button button-primary"></p>
-    </form>
-    ';
+    $ret .= '<p class="submit"><input type="submit" value="Create Item" class="button button-primary"></p></form></div>';
 
     return $ret;
 }

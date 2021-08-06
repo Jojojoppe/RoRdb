@@ -98,6 +98,9 @@ function rordb_options_page_html(){
 		search in the service account drive for a valid installation of RoRdb with the set UID. If it is found, the RoRdb wordpress plugin will automatically
 		load all the settings. The second one will create a new installation of RoRdb (and deletes the previous one if it exists). The last will delete the
 		installation of RoRdb.
+
+    	<p><a href='https://github.com/Jojojoppe/RoRdb/issues'>Report an issue</a></p>
+
 		<form action="options.php" method="post">
 			<?php
 			settings_fields('rordb');

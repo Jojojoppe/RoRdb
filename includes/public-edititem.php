@@ -12,27 +12,38 @@ function rordb_public_edititem_sidebar(){
 function rordb_public_edititem_main(){
     $ret = "";
 
-    // Check if right permissions
-	if(!rordb_can_user_edit_items()){
-        $ret .= "<i>ERROR: You dont have permission to edit RoRdb items!</i>";
-        return $ret;
-    }
-    // Check if valid database is loaded
+    // Check for valid database
     if(!get_option("rordb_valid_database")){
-        $ret .= "<i>ERROR: No valid database is loaded. Contact the dotCom!</i>";
-        return $ret;
+        rordb_error("No valid database is loaded", "error");
+        return rordb_show_errors();
     }
+
+    // CHeck for right permissions
+    if(!rordb_can_user_edit_items()){
+        rordb_error("You don't have permission to edit items", "error");
+        return rordb_show_errors();
+    }
+
+    // Load image compression and conversion script
+	wp_enqueue_script('rordb_public_items_js', plugin_dir_url(__FILE__)."../resources/js/settings_fields.js", array(), null, true);
 
     // Create database object to interact with
     $db = new RordbDatabase();
-	wp_enqueue_script('rordb_public_items_js', plugin_dir_url(__FILE__)."../resources/js/settings_fields.js", array(), null, true);
 
+    // Check if there is an item to edit
     if(!isset($_GET['rordb_edit_item'])){
-        $ret .= "<i>ERROR: No item selected</i>";
+        rordb_error("No item selected to edit");
+        return rordb_show_errors();
     }
 
-    // Do action
+    // Do actions if needed
+    // CHeck if item must be updated
     if(isset($_POST["rordb_edit_item"])){
+
+        // COnvert hidden field to right format
+        if(!isset($_POST['rordb_create_hidden'])) $_POST['rordb_create_hidden'] = 0;
+        elseif($_POST['rordb_create_hidden']=="off") $_POST['rordb_create_hidden'] = 0;
+        else $_POST['rordb_create_hidden'] = 1;
 
         $i = $db->db_query("select * where A=".$_GET['rordb_edit_item'], "Items")[0];
         $fid = $i[10];
@@ -44,10 +55,6 @@ function rordb_public_edititem_main(){
             $db->api->drive_share($fid, "", "reader");
         }
 
-        if(!isset($_POST['rordb_create_hidden'])) $_POST['rordb_create_hidden'] = 0;
-        elseif($_POST['rordb_create_hidden']=="off") $_POST['rordb_create_hidden'] = 0;
-        else $_POST['rordb_create_hidden'] = 1;
-
         // Edit the item
         $db->update_item($_GET['rordb_edit_item'], $_POST['rordb_create_name'], $_POST['rordb_create_category'], $_POST['rordb_create_location'],
             $_POST['rordb_create_color'], $_POST['rordb_create_size'], $_POST['rordb_create_amount'],
@@ -55,23 +62,29 @@ function rordb_public_edititem_main(){
             $fid,
             $_POST['rordb_create_claimed'], $_POST['rordb_create_hidden']
         );
+
+        rordb_error("Item successfully updated", "message");
     }
         
+    // Show errors if needed
+    $ret .= rordb_show_errors();
 
+    // Get item information
     $items = $db->db_query("select * where A=".$_GET['rordb_edit_item'], "Items")[0];
 
-    $ret .= '
-            <h2>Edit RoRdb item</h2>
-            <form action="" method="post">
-                <input type="hidden" name="rordb_edit_item" value=1>
-                <p>
-                    <label>Item name</label>
-                    <input type="text" name="rordb_create_name" value="'.$items[1].'">
-                </p>
-                <p>
-                    <label>Category</label>
-                    <select name="rordb_create_category" value="">
-    ';
+    // Render edit item form
+
+    function add_field($field, $label){
+        $ret = "<p><label>".$label."<br><span class='wpcf7-form-control-wrap'>".$field."</p>";
+        return $ret;
+    }
+
+    $ret .= '<h2>Edit item</h2><div role="form" class="wpcf7"><form acttion="" method="post" class="wpcf7">
+        <input type="hidden" name="rordb_edit_item" value=1>';
+
+    $ret .= add_field('<input type="text" name="rordb_create_name" class="wpcf7-form-control wpcf7-text" value="'.$items[1].'">', "Category name");
+
+    $categories = '';
     $db->categories_execute_recursive(function($c, $lvl, &$items, &$ret){
         $name = $c["name"];
         $id = $c["id"];
@@ -79,14 +92,10 @@ function rordb_public_edititem_main(){
         $ret .= "<option value='".$name."' ";
         if($name==$items[2]) $ret .= 'selected';
         $ret .= ">".$indent.$name."</option>";
-    }, $items, $ret);
-    $ret .= '
-                    </select>
-                </p>
-                <p>
-                    <label>Location</label>
-                    <select name="rordb_create_location" value="">
-    ';
+    }, $items, $categories);
+    $ret .= add_field('<select name="rordb_create_category">'.$categories.'</select>', 'Category');
+
+    $locations = '';
     $db->locations_execute_recursive(function($c, $lvl, &$items, &$ret){
         $name = $c["name"];
         $id = $c["id"];
@@ -94,54 +103,30 @@ function rordb_public_edititem_main(){
         $ret .= "<option value='".$name."' ";
         if($name==$items[2]) $ret .= 'selected';
         $ret .= ">".$indent.$name."</option>";
-    }, $items, $ret);
-    $ret .= '
-                    </select>
-                </p>
+    }, $items, $locations);
+    $ret .= add_field('<select name="rordb_create_location">'.$locations.'</select>', 'Location');
 
-                <p>
-                    <label>Color</label>
-                    <input type="text" name="rordb_create_color" value="'.$items[4].'">
-                </p>
+    $ret .= add_field('<input type="text" name="rordb_create_color" value="'.$items[4].'">', 'Color');
 
-                <p>
-                    <label>Size</label>
-                    <input type="text" name="rordb_create_size" value="'.$items[5].'">
-                </p>
+    $ret .= add_field('<input type="text" name="rordb_create_size" value="'.$items[5].'">', 'Size');
 
-                <p>
-                    <label>Amount</label>
-                    <input type="text" name="rordb_create_amount" value="'.$items[6].'">
-                </p>
+    $ret .= add_field('<input type="text" name="rordb_create_amount" value="'.$items[6].'">', 'Amount');
 
-                <p>
-                    <label>Comments</label>
-                    <textarea name="rordb_create_comments" value="" rows="10">'.$items[7].'</textarea>
-                </p>
+    $ret .= add_field('<textarea name="rordb_create_comments" rows="10">'.$items[7].'</textarea>', 'Comments');
 
-                <p>
-                    <label>Claimed</label>
-                    <input type="text" name="rordb_create_claimed" value="'.$items[11].'">
-                </p>
+    $ret .= add_field('<input type="text" name="rordb_create_claimed" value="'.$items[11].'">', 'Claimed');
 
-                <p>
-                    <label>Hidden</label>
-                    <input type="checkbox" name="rordb_create_hidden" value="" ';
-        if($items[12]=='1') $ret .= "checked";
-        $ret .= '
-                    >
-                </p>
+    $hidden = '';
+    if($items[12]=='1') $hidden = 'checked';
+    $ret .= add_field('<input type="checkbox" name="rordb_create_hidden" '.$hidden.'>', "Hidden");
 
-                <p>
-                    <label>Image</label>
-                    <input type="hidden" name="rordb_create_img" id="rordb_create_img" value="">
+    $ret .= add_field('
+        <input type="hidden" name="rordb_create_img" id="rordb_create_img">
                     <img id="rordb_imgtest" width=200 src="https://drive.google.com/thumbnail?id='.$items[10].'&sz=w200-h200"><br>
-                    <input type="file" accept="image/*" id="rordb_file_imgtest" onchange=\'javscript:rordb_put_imgcontent_in_img("rordb_file_imgtest", "rordb_imgtest", "rordb_create_img")\'>
-                </p>
+        <input type="file" accept="image/*" id="rordb_file_imgtest" onchange=\'javscript:rordb_put_imgcontent_in_img("rordb_file_imgtest", "rordb_imgtest", "rordb_create_img")\'>
+    ', "Image");
 
-                <p class="submit"><input type="submit" value="Edit Item" class="button button-primary"></p>
-            </form>
-        ';
+    $ret .= '<p class="submit"><input type="submit" value="Edit Item" class="button button-primary"></p></form></div>';
 
     return $ret;
 }

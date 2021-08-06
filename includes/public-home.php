@@ -11,20 +11,28 @@ function rordb_public_home_sidebar(){
     $ret .= "> View RoRdb items<br>";
 
     $ret .= "<input type='checkbox' disabled";
-    if(rordb_can_user_edit_settings()) $ret .= " checked";
-    $ret .= "> Edit RoRdb settings (dotCom only)<br>";
+    if(rordb_can_user_create_items()) $ret .= " checked";
+    $ret .= "> Create RoRdb items<br>";
 
-    $ret .= "<input type='checkbox' disabled";
-    if(rordb_can_user_edit_categories()) $ret .= " checked";
-    $ret .= "> Edit RoRdb categories<br>";
 
-    $ret .= "<input type='checkbox' disabled";
-    if(rordb_can_user_edit_locations()) $ret .= " checked";
-    $ret .= "> Edit RoRdb locations<br>";
 
-    $ret .= "<input type='checkbox' disabled";
-    if(rordb_can_user_edit_items()) $ret .= " checked";
-    $ret .= "> Edit RoRdb items<br>";
+    // $ret .= "<input type='checkbox' disabled";
+    // if(rordb_can_user_edit_items()) $ret .= " checked";
+    // $ret .= "> Edit RoRdb items<br>";
+
+    // $ret .= "<input type='checkbox' disabled";
+    // if(rordb_can_user_edit_settings()) $ret .= " checked";
+    // $ret .= "> Edit RoRdb settings (dotCom only)<br>";
+
+    // $ret .= "<input type='checkbox' disabled";
+    // if(rordb_can_user_edit_categories()) $ret .= " checked";
+    // $ret .= "> Edit RoRdb categories<br>";
+
+    // $ret .= "<input type='checkbox' disabled";
+    // if(rordb_can_user_edit_locations()) $ret .= " checked";
+    // $ret .= "> Edit RoRdb locations<br>";
+
+
 
     // Display WIP notice
     $ret .= "<hr>WARNING: RoRdb is still WIP! Not everything will work as expected and not all planned functionality is implemented.";
@@ -45,6 +53,8 @@ function rordb_public_home_main(){
 		search in the service account drive for a valid installation of RoRdb with the set UID. If it is found, the RoRdb wordpress plugin will automatically
 		load all the settings. The second one will create a new installation of RoRdb (and deletes the previous one if it exists). The last will delete the
 		installation of RoRdb";
+
+    $ret .= "<p><a href='https://github.com/Jojojoppe/RoRdb/issues'>Report an issue</a></p>";
 
     // Print licence
     $ret .= "<hr><h3>Licence</h3><pre>";
