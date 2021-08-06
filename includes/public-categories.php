@@ -101,7 +101,7 @@ function rordb_public_categories_main(){
         $ret .= '<h2>Edit category</h2><div role="form" class="wpcf7"><form acttion="'.$action_url.'" method="post" class="wpcf7">';
         $ret .= '<input type="hidden" name="rordb_edit_id" value="'.$currentcatid.'">';
 
-        $ret .= add_field('<input type="text" name="rordb_create_name" value="'.$currentcatname.'">', 'Category name');
+        $ret .= add_field('<input type="text" name="rordb_edit_name" value="'.$currentcatname.'">', 'Category name');
 
         $categories = '';
         $db->categories_execute_recursive(function($c, $lvl, &$ret, &$category){
@@ -115,7 +115,7 @@ function rordb_public_categories_main(){
             $ret .= ">".$indent.$name;
             $ret .= "</option>";
         }, $categories, $category);
-        $ret .= add_field('<select name="rordb_create_parent">'.$categories.'</select>', 'Parent category');
+        $ret .= add_field('<select name="rordb_edit_parent">'.$categories.'</select>', 'Parent category');
 
         $ret .= add_field('<input type="checkbox" name="rordb_edit_delete">', "Delete category");
 
