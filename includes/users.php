@@ -13,11 +13,16 @@ function rordb_users_init(){
         "rordb_view_categories"=>true,
         "rordb_edit_categories"=>true,
         "rordb_create_categories"=>true,
+
+        "rordb_view_locations"=>true,
+        "rordb_edit_locations"=>true,
+        "rordb_create_locations"=>true,
     ]);
 
     wp_roles()->add_role("rordb_viewer", "RoRdb viewer", [
         "rordb_view_items"=>true,
         "rordb_view_categories"=>true,
+        "rordb_view_locations"=>true,
     ]);
 
     // Add capabilities to administrator
@@ -31,6 +36,10 @@ function rordb_users_init(){
     $admin->add_cap("rordb_view_categories", true);
     $admin->add_cap("rordb_edit_categories", true);
     $admin->add_cap("rordb_create_categories", true);
+
+    $admin->add_cap("rordb_view_locations", true);
+    $admin->add_cap("rordb_edit_locations", true);
+    $admin->add_cap("rordb_create_locations", true);
 }
 
 // Deinitialize user stuff
@@ -46,6 +55,10 @@ function rordb_users_deinit(){
     $admin->remove_cap("rordb_view_categories");
     $admin->remove_cap("rordb_edit_categories");
     $admin->remove_cap("rordb_create_categories");
+
+    $admin->remove_cap("rordb_view_locations");
+    $admin->remove_cap("rordb_edit_locations");
+    $admin->remove_cap("rordb_create_locations");
 
     wp_roles()->remove_role("rordb");
     wp_roles()->remove_role("rordb_viewer");
@@ -67,6 +80,10 @@ function rordb_register_cap_groups() {
                 "rordb_view_categories",
                 "rordb_edit_categories",
                 "rordb_create_categories",
+
+                "rordb_view_locations",
+                "rordb_edit_locations",
+                "rordb_create_locations",
             ),
 			'icon'     => 'dashicons-database',
 			'priority' => 10
@@ -99,4 +116,16 @@ function rordb_can_user_edit_categories(){
 
 function rordb_can_user_create_categories(){
     return current_user_can('rordb_create_categories');
+}
+
+function rordb_can_user_view_locations(){
+    return current_user_can('rordb_view_locations');
+}
+
+function rordb_can_user_edit_locations(){
+    return current_user_can('rordb_edit_locations');
+}
+
+function rordb_can_user_create_locations(){
+    return current_user_can('rordb_create_locations');
 }

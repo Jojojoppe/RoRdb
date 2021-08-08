@@ -129,7 +129,6 @@ function rordb_public_categories_main(){
             return rordb_show_errors();
         }
 
-
         $db = new RordbDatabase();
 
         // Show errors if needed

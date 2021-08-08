@@ -34,21 +34,17 @@ function rordb_public_home_sidebar(){
     if(rordb_can_user_edit_categories()) $ret .= " checked";
     $ret .= "> Edit RoRdb categories<br>";
 
+    $ret .= "<input type='checkbox' disabled";
+    if(rordb_can_user_view_locations()) $ret .= " checked";
+    $ret .= "> View RoRdb locations<br>";
 
+    $ret .= "<input type='checkbox' disabled";
+    if(rordb_can_user_create_locations()) $ret .= " checked";
+    $ret .= "> Create RoRdb locations<br>";
 
-    // $ret .= "<input type='checkbox' disabled";
-    // if(rordb_can_user_edit_settings()) $ret .= " checked";
-    // $ret .= "> Edit RoRdb settings (dotCom only)<br>";
-
-    // $ret .= "<input type='checkbox' disabled";
-    // if(rordb_can_user_edit_categories()) $ret .= " checked";
-    // $ret .= "> Edit RoRdb categories<br>";
-
-    // $ret .= "<input type='checkbox' disabled";
-    // if(rordb_can_user_edit_locations()) $ret .= " checked";
-    // $ret .= "> Edit RoRdb locations<br>";
-
-
+    $ret .= "<input type='checkbox' disabled";
+    if(rordb_can_user_edit_locations()) $ret .= " checked";
+    $ret .= "> Edit RoRdb locations<br>";
 
     // Display WIP notice
     $ret .= "<hr>WARNING: RoRdb is still WIP! Not everything will work as expected and not all planned functionality is implemented.";
