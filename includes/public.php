@@ -6,15 +6,11 @@ function rordb_public_render_menu($button_class, $link_class){
     $pageid = "";
     if(isset($_GET['page_id'])) $pageid = $_GET['page_id'];
 
-    function add_link($href, $title){
-        return "<a href='".$href."'>".$title."</a><br>";
-    }
-
-    $ret .= add_link("?page_id=".$pageid."&rordb_action=home", "Home");
-    $ret .= add_link("?page_id=".$pageid."&rordb_action=items", "Search items");
-    $ret .= add_link("?page_id=".$pageid."&rordb_action=createitem", "Create new item");
-    $ret .= add_link("?page_id=".$pageid."&rordb_action=categories", "Edit categories");
-    $ret .= add_link("?page_id=".$pageid."&rordb_action=locations", "Edit locations");
+    $ret .= "<a href='?page_id=".$pageid."&rordb_action=home'>Home</a><br>";
+    $ret .= "<a href='?page_id=".$pageid."&rordb_action=items'>Search items</a><br>";
+    $ret .= "<a href='?page_id=".$pageid."&rordb_action=createitem'>Create new item</a><br>";
+    $ret .= "<a href='?page_id=".$pageid."&rordb_action=categories'>Edit categories</a><br>";
+    $ret .= "<a href='?page_id=".$pageid."&rordb_action=locations'>Edit locations</a><br>";
 
     return $ret;
 }
