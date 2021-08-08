@@ -3,6 +3,9 @@
 function rordb_public_home_sidebar(){
     $ret = "";
 
+    // MENU
+    $ret .= rordb_public_render_menu('', '') . "<hr>";
+
     // List capabilities of current logged in user
     $ret .= "You're currently logged in and have the following permissions:<br>";
 

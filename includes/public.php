@@ -1,28 +1,20 @@
 <?php
 
 function rordb_public_render_menu($button_class, $link_class){
-    $ret = "";
+    $ret = "<h5>Menu</h5>";
 
     $pageid = "";
     if(isset($_GET['page_id'])) $pageid = $_GET['page_id'];
 
-    function add_button($href, $title, $button_class, $link_class, $width){
-        $ret = "<div class='wp-block-column' style='flex-basis:".$width."'>";
-        $ret .= "<a href='".$href."' class='".$link_class."'>";
-        $ret .= "<div class='".$button_class."'>";
-        $ret .= $title;
-        $ret .= "</div></a></div>";
-        return $ret;
+    function add_link($href, $title){
+        return "<a href='".$href."'>".$title."</a><br>";
     }
 
-    // Menu bar
-    $ret .= "<div class='wp-block-columns' width='100%'>";
-    $width = "25%";
-    $ret .= add_button("?page_id=".$pageid."&rordb_action=home", "Home", $button_class, $link_class, $width);
-    $ret .= add_button("?page_id=".$pageid."&rordb_action=items", "Items", $button_class, $link_class, $width);
-    $ret .= add_button("?page_id=".$pageid."&rordb_action=categories", "Categories", $button_class, $link_class, $width);
-    $ret .= add_button("?page_id=".$pageid."&rordb_action=locations", "Locations", $button_class, $link_class, $width);
-    $ret .= "</div>";
+    $ret .= add_link("?page_id=".$pageid."&rordb_action=home", "Home");
+    $ret .= add_link("?page_id=".$pageid."&rordb_action=items", "Search items");
+    $ret .= add_link("?page_id=".$pageid."&rordb_action=createitem", "Create new item");
+    $ret .= add_link("?page_id=".$pageid."&rordb_action=categories", "Edit categories");
+    $ret .= add_link("?page_id=".$pageid."&rordb_action=locations", "Edit locations");
 
     return $ret;
 }

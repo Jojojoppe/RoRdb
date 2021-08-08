@@ -3,6 +3,9 @@
 function rordb_public_items_sidebar(){
     $ret = "";
 
+    // MENU
+    $ret .= rordb_public_render_menu('', '') . "<hr>";
+
     // Check for valid database
     if(!get_option("rordb_valid_database")){
         rordb_error("No valid database is loaded", "error");
@@ -23,11 +26,6 @@ function rordb_public_items_sidebar(){
     $ret .= ">";
     $ret .= "<input type='submit' class='button button-primary' value='Search'>";
     $ret .= "</form>";
-
-    // Create item button
-    $ret .= "<hr>";
-    $pageid = $_GET['page_id'];
-    $ret .= "<a href='?page_id=".$pageid."&rordb_action=createitem'>Create new item</a>";
 
     // Display WIP notice
     $ret .= "<hr>WARNING: RoRdb is still WIP! Not everything will work as expected and not all planned functionality is implemented.";

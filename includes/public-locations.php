@@ -3,6 +3,9 @@
 function rordb_public_locations_sidebar(){
     $ret = "";
 
+    // MENU
+    $ret .= rordb_public_render_menu('', '') . "<hr>";
+
     // Check for valid database
     if(!get_option("rordb_valid_database")){
         rordb_error("No valid database is loaded", "error");

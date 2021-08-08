@@ -3,8 +3,11 @@
 function rordb_public_createitem_sidebar(){
     $ret = "";
 
+    // MENU
+    $ret .= rordb_public_render_menu('', '') . "<hr>";
+
     // Display WIP notice
-    $ret .= "<hr>WARNING: RoRdb is still WIP! Not everything will work as expected and not all planned functionality is implemented.";
+    $ret .= "WARNING: RoRdb is still WIP! Not everything will work as expected and not all planned functionality is implemented.";
 
     return $ret;
 }

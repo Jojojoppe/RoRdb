@@ -3,6 +3,9 @@
 function rordb_public_edititem_sidebar(){
     $ret = "";
 
+    // MENU
+    $ret .= rordb_public_render_menu('', '');
+
     // Display WIP notice
     $ret .= "<hr>WARNING: RoRdb is still WIP! Not everything will work as expected and not all planned functionality is implemented.";
 

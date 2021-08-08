@@ -1,14 +1,5 @@
 <?php
 
-function rordb_shortcode_menu($atts=[], $content=null){
-    // parse options
-    if(!array_key_exists('button_class', $atts)) $atts['button_class'] = '';
-    if(!array_key_exists('link_class', $atts)) $atts['link_class'] = '';
-
-    return rordb_public_render_menu($atts['button_class'], $atts['link_class']);
-}
-add_shortcode('rordb_menu', 'rordb_shortcode_menu');
-
 function rordb_shortcode_sidebar($atts=[], $content=null){
     return rordb_public_render_sidebar();
 }
