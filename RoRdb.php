@@ -5,10 +5,9 @@ Plugin URI: https://github.com/Jojojoppe/RoRdb
 Version: 0.1.0
 License: BSD-2
 Author: Joppe Blondel
-Author URI: https://github.com/Jojojoppe
+Author URI: https://joppeb.nl
 Description: Room of Requirements (RoR) database using Google drive and sheets
 Requires PHP: 7
-GitHub Plugin URI: Jojojoppe/RoRdb
 
 Copyright (c) 2022, Joppe Blondel
 
