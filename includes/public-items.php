@@ -68,20 +68,20 @@ function rordb_public_items_main(){
     foreach($searchresults as $i){
         $ret .= "<div class='wp-block-columns' style='background-color:#d6c2d6'>";
             $ret .= "<div class='wp-block-column' style='flex-basis:50%;'>";
-                $ret .= "<img height='100%' src='https://drive.google.com/thumbnail?id=".$i[10]."&sz=w200-h200'>";
+                $ret .= "<img height='100%' src='https://drive.google.com/thumbnail?id=".$i[6]."&sz=w200-h200'>";
             $ret .= "</div>";
             $ret .= "<div class='wp-block-column' style='flex-basis:50%;'>";
-                        $pageid = $_GET['page_id'];
+                        $pageid = ''; //$_GET['page_id'];
                         $ret .= "<a href='?page_id=".$pageid."&rordb_action=edititem&rordb_edit_item=".$i[0]."'>Edit item</a><br>";
                         $ret .= "Name: " . $i[1] . "<br>";
-                        $ret .= "Category: " . $i[2] . "<br>";
-                        $ret .= "Location: " . $i[3] . "<br>";
-                        $ret .= "Color: " . $i[4] . "<br>";
-                        $ret .= "Size: " . $i[5] . "<br>";
-                        $ret .= "Amount: " . $i[6] . "<br>";
-                        $ret .= "Comments: " . $i[7] . "<br>";
-                        $ret .= "Claimed: " . $i[11] . "<br>";
-                        $ret .= "Hidden: " . $i[12] . "<br>";
+                        $ret .= "Category: " . $i[9] . "<br>";
+                        $ret .= "Location: " . $i[11] . "<br>";
+                        $ret .= "Color: " . $i[2] . "<br>";
+                        $ret .= "Size: " . $i[3] . "<br>";
+                        $ret .= "Amount: " . $i[4] . "<br>";
+                        $ret .= "Comments: " . $i[5] . "<br>";
+                        $ret .= "Claimed: " . $i[13] . "<br>";
+                        $ret .= "Hidden: " . $i[8] . "<br>";
             $ret .= "</div>";
         $ret .= "</div>";
     }

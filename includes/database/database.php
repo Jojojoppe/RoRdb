@@ -143,7 +143,7 @@ class RordbDatabase{
 			// Create items tab
 			$this->api->sheets_create_sheet($sheetid, "Items");
 			$this->api->sheets_put_range($sheetid, "Items", "A1", [
-				["ID", "Name", "Color", "Size", "Amount", "Comments", "Image", "Claimed", "Hidden"]
+				["ID", "Name", "Color", "Size", "Amount", "Comments", "Image", "-", "Hidden"]
 			]);
 
 			// Create 3 hierarchical tabs
@@ -289,6 +289,9 @@ class RordbDatabase{
 	}
 
 	function update_hier($id, $name, $parent, $tab){
+		// Get category, location and claimed columns
+		$abc = ['J', 'K', 'L', 'M', 'N', 'O', 'P'];
+		$catcol = $abc[($this->hier[$tab]-1)*2];
 		try{
 			$res = $this->get_hier_list($tab);
 			$categories_flat = $res[1];
@@ -319,16 +322,15 @@ class RordbDatabase{
 				[$name, $parent]
 			], false);	
 
-			// TODO FIXME
 			// Change name of category of items placed in this category
-			// $query = "select * where C='".$categories_flat[$id]['name']."'";
-			// $ret = $this->db_query($query, "Items");
-			// foreach($ret as $i){
-			// 	$range = "C".($i[0]+2);
-			// 	$this->api->sheets_put_range($this->sheet, "Items", $range, [
-			// 		[$name]
-			// 	], false);
-			// }
+			$query = "select * where $catcol='".$categories_flat[$id]['name']."'";
+			$ret = $this->db_query($query, "Items");
+			foreach($ret as $i){
+				$range = $catcol.($i[0]+2);
+				$this->api->sheets_put_range($this->sheet, "Items", $range, [
+					[$name]
+				], false);
+			}
 
 		}catch(Exception $e){
 			$this->error(__FUNCTION__.": ".$e->getMessage());
@@ -336,17 +338,19 @@ class RordbDatabase{
 	}
 
 	function delete_hier($id, $tab){
+		// Get category, location and claimed columns
+		$abc = ['J', 'K', 'L', 'M', 'N', 'O', 'P'];
+		$catcol = $abc[($this->hier[$tab]-1)*2];
 		try{
 			$res = $this->get_hier_list($tab);
 			$categories_flat = $res[1];
 
-			// TODO FIXME
-			// // Update all the children with id as parent -> set to parent of deleted category
-			// $query = "select * where C='".$categories_flat[$id]["name"]."'";
-			// $ret = $this->db_query($query, "Categories");
-			// foreach($ret as $c){
-			// 	$this->update_category($c[0], $c[1], $categories_flat[$id]["parent"]);
-			// }
+			// Update all the children with id as parent -> set to parent of deleted category
+			$query = "select * where $catcol='".$categories_flat[$id]["name"]."'";
+			$ret = $this->db_query($query, $tab);
+			foreach($ret as $c){
+				$this->update_hier($c[0], $c[1], $categories_flat[$id]["parent"], $tab);
+			}
 		
 			// Update category
 			$range = "B".($id+2);
@@ -354,16 +358,15 @@ class RordbDatabase{
 				["", "", "", "", "", "", "", "", ""]
 			], false);	
 
-			// TODO FIXME
-			// // Update items in this category to None
-			// $query = "select * where C='".$categories_flat[$id]['name']."'";
-			// $ret = $this->db_query($query, "Items");
-			// foreach($ret as $i){
-			// 	$range = "C".($i[0]+2);
-			// 	$this->api->sheets_put_range($this->sheet, "Items", $range, [
-			// 		["None"]
-			// 	], false);
-			// }
+			// Update items in this category to None
+			$query = "select * where $catcol='".$categories_flat[$id]['name']."'";
+			$ret = $this->db_query($query, "Items");
+			foreach($ret as $i){
+				$range = $catcol.($i[0]+2);
+				$this->api->sheets_put_range($this->sheet, "Items", $range, [
+					["None"]
+				], false);
+			}
 
 		}catch(Exception $e){
 			$this->error(__FUNCTION__.": ".$e->getMessage());
@@ -378,16 +381,21 @@ class RordbDatabase{
 		try{
 			if($hidden) $hidden = "1"; else $hidden = "0";
 			// Get ID of next item
-			$next_id = $this->api->sheets_get_range($this->sheet, "Info", "B3")[0][0];
+			$next_id = $this->api->sheets_get_range($this->sheet, "Info", "D1")[0][0];
 			$row = $next_id+2;
 			// Get start cell of new row
 			$range = "A".$row;
+			// Get category, location and claimed columns
+			$abc = ['J', 'K', 'L', 'M', 'N', 'O', 'P'];
+			$catcol = $abc[($this->hier["Categories"]-1)*2];
+			$loccol = $abc[($this->hier["Locations"]-1)*2];
+			$clmcol = $abc[($this->hier["Claimgroups"]-1)*2];
 			// Put into sheet
 			$this->api->sheets_put_range($this->sheet, "Items", $range, [
-				[$next_id, $name, $category, $location, $color, $size, $amount, $comments,
-					"=VLOOKUP(C$row, {Categories!B2:B, Categories!I2:I}, 2, FALSE)", 
-					"=VLOOKUP(D$row, {Locations!B2:B, Locations!I2:I}, 2, FALSE)", 
-					$image, $claimed, $hidden
+				[$next_id, $name, $color, $size, $amount, $comments, $image, '', $hidden, 
+					$category, "=VLOOKUP($catcol$row, {Categories!B2:B, Categories!I2:I}, 2, FALSE)", 
+					$location, "=VLOOKUP($loccol$row, {Locations!B2:B, Locations!I2:I}, 2, FALSE)", 
+					$claimed, "=VLOOKUP($clmcol$row, {Claimgroups!B2:B, Claimgroups!I2:I}, 2, FALSE)", 
 				]
 			], false);
 		}catch(exception $e){
@@ -396,12 +404,23 @@ class RordbDatabase{
 	}
 
 	function update_item($id, $name, $category, $location, $color, $size, $amount, $comments, $image, $claimed, $hidden){
+		// Get category, location and claimed columns
+		$abc = ['J', 'K', 'L', 'M', 'N', 'O', 'P'];
+		$catcol = $abc[($this->hier["Categories"]-1)*2];
+		$loccol = $abc[($this->hier["Locations"]-1)*2];
+		$clmcol = $abc[($this->hier["Claimgroups"]-1)*2];
 		try{
 			$this->api->sheets_put_range($this->sheet, "Items", "A".((int)$id+2), [
-				[$id, $name, $category, $location, $color, $size, $amount, $comments]
+				[$id, $name, $color, $size, $amount, $comments, $image, '', $hidden]
 			], false);
-			$this->api->sheets_put_range($this->sheet, "Items", "K".((int)$id+2), [
-				[$image, $claimed, $hidden]
+			$this->api->sheets_put_range($this->sheet, "Items", $catcol.((int)$id+2), [
+				[$category]
+			], false);
+			$this->api->sheets_put_range($this->sheet, "Items", $loccol.((int)$id+2), [
+				[$location]
+			], false);
+			$this->api->sheets_put_range($this->sheet, "Items", $clmcol.((int)$id+2), [
+				[$claimed]
 			], false);
 		}catch(Exception $e){
 			$this->error(__FUNCTION__.": ".$e->getMessage());
@@ -410,7 +429,7 @@ class RordbDatabase{
 
 	function delete_item($id){
 		try{
-
+			throw "Not implemented yet";
 		}catch(Exception $e){
 			$this->error(__FUNCTION__.": ".$e->getMessage());
 		}
@@ -419,19 +438,28 @@ class RordbDatabase{
 	function items_search($searchtag, $specifics, $exc){
 
 		// Used collumns
+		// Get category, location and claimed columns
+		$abc = ['J', 'K', 'L', 'M', 'N', 'O', 'P'];
+		$catcol = $abc[($this->hier["Categories"]-1)*2];
+		$cattcol = $abc[($this->hier["Categories"]-1)*2];
+		$loccol = $abc[($this->hier["Locations"]-1)*2];
+		$loctcol = $abc[($this->hier["Locations"]-1)*2];
+		$clmcol = $abc[($this->hier["Claimgroups"]-1)*2];
+		$clmtcol = $abc[($this->hier["Claimgroups"]-1)*2];
 		$cols = [
 			'ID' => 'A',
 			'Name' => 'B',
-			'Category' => 'C',
-			'Location' => 'D',
-			'Color' => 'E',
-			'Size' => 'F',
-			'Amount' => 'G',
-			'Comments' => 'H',
-			'Category_tree' => 'I',
-			'Location_tree' => 'J',
-			'Claimed' => 'L',
-			'Hidden' => 'M'
+			'Color' => 'C',
+			'Size' => 'D',
+			'Amount' => 'E',
+			'Comments' => 'F',
+			'Hidden' => 'I',
+			'Category' => $catcol,
+			'Location' => $loccol,
+			'clmcol' => $clmcol,
+			'Category_tree' => $cattcol,
+			'Laction_tree' => $loctcol,
+			// 'Claimgroup_tree' => $clmtcol,
 		];
 
 		// Build up search collumns

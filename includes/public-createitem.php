@@ -70,16 +70,21 @@ function rordb_public_createitem_main(){
     // Render create item form
 
     function add_field($field, $label){
-        $ret = "<p><label>".$label."<br><span class='wpcf7-form-control-wrap'>".$field."</p>";
+        $ret = "<p><label>".$label."<br><span class='wpcf7-form-control-wrap'>".$field."</p>\r\n";
         return $ret;
     }
 
     $ret .= '<h2>Create item</h2><div role="form" class="wpcf7"><form acttion="" method="post" class="wpcf7">';
 
+    // Start of creation form
+    // ----------------------
+
+    // Name
     $ret .= add_field('<input type="text" name="rordb_create_name" class="wpcf7-form-control wpcf7-text">', "Item name");
 
+    // Category
     $categories = '';
-    $db->categories_execute_recursive(function($c, $lvl, &$p){
+    $db->hier_execute_recursive("Categories", function($c, $lvl, &$p){
         $name = $c["name"];
         $id = $c["id"];
         $indent = str_repeat("----", $lvl);
@@ -87,8 +92,9 @@ function rordb_public_createitem_main(){
     }, $categories);
     $ret .= add_field('<select name="rordb_create_category">'.$categories.'</select>', 'Category');
 
+    // Location
     $locations = '';
-    $db->locations_execute_recursive(function($c, $lvl, &$p){
+    $db->hier_execute_recursive("Locations", function($c, $lvl, &$p){
         $name = $c["name"];
         $id = $c["id"];
         $indent = str_repeat("----", $lvl);
@@ -96,18 +102,34 @@ function rordb_public_createitem_main(){
     }, $locations);
     $ret .= add_field('<select name="rordb_create_location">'.$locations.'</select>', 'Location');
 
+    // Color
     $ret .= add_field('<input type="text" name="rordb_create_color">', 'Color');
 
+    // Size
     $ret .= add_field('<input type="text" name="rordb_create_size">', 'Size');
 
+    // Amount
     $ret .= add_field('<input type="text" name="rordb_create_amount">', 'Amount');
 
+    // Comments
     $ret .= add_field('<textarea name="rordb_create_comments" rows="10"></textarea>', 'Comments');
 
-    $ret .= add_field('<input type="text" name="rordb_create_claimed">', 'Claimed');
+    // Claimed
+    $claimgroups = '';
+    $db->hier_execute_recursive("Claimgroups", function($c, $lvl, &$p){
+        $name = $c["name"];
+        $id = $c["id"];
+        $indent = str_repeat("----", $lvl);
+        $p .= "<option value='".$name."'";
+        if($name=='None') $p .= ' selected';
+        $p .= ">".$indent.$name."</option>";
+    }, $claimgroups);
+    $ret .= add_field('<select name="rordb_create_claimed">'.$claimgroups.'</select>', 'Claimed');
 
+    // Hidden
     $ret .= add_field('<input type="checkbox" name="rordb_create_hidden">', "Hidden");
 
+    // Image
     $ret .= add_field('
         <input type="hidden" name="rordb_create_img" id="rordb_create_img">
         <img id="rordb_imgtest" width="200"><br>

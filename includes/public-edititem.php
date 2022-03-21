@@ -85,47 +85,69 @@ function rordb_public_edititem_main(){
     $ret .= '<h2>Edit item</h2><div role="form" class="wpcf7"><form acttion="" method="post" class="wpcf7">
         <input type="hidden" name="rordb_edit_item" value=1>';
 
-    $ret .= add_field('<input type="text" name="rordb_create_name" class="wpcf7-form-control wpcf7-text" value="'.$items[1].'">', "Category name");
+    // Start of creation form
+    // ----------------------
 
+    // Name
+    $ret .= add_field('<input type="text" name="rordb_create_name" class="wpcf7-form-control wpcf7-text" value="'.$items[1].'">', "Item name");
+
+    // Category
     $categories = '';
-    $db->categories_execute_recursive(function($c, $lvl, &$items, &$ret){
+    $db->hier_execute_recursive("Categories", function($c, $lvl, &$items, &$ret){
         $name = $c["name"];
         $id = $c["id"];
         $indent = str_repeat("----", $lvl);
         $ret .= "<option value='".$name."' ";
-        if($name==$items[2]) $ret .= 'selected';
+        if($name==$items[9]) $ret .= 'selected';
         $ret .= ">".$indent.$name."</option>";
     }, $items, $categories);
     $ret .= add_field('<select name="rordb_create_category">'.$categories.'</select>', 'Category');
 
+    // Location
     $locations = '';
-    $db->locations_execute_recursive(function($c, $lvl, &$items, &$ret){
+    $db->hier_execute_recursive("Locations", function($c, $lvl, &$items, &$ret){
         $name = $c["name"];
         $id = $c["id"];
         $indent = str_repeat("----", $lvl);
         $ret .= "<option value='".$name."' ";
-        if($name==$items[2]) $ret .= 'selected';
+        if($name==$items[11]) $ret .= 'selected';
         $ret .= ">".$indent.$name."</option>";
     }, $items, $locations);
     $ret .= add_field('<select name="rordb_create_location">'.$locations.'</select>', 'Location');
 
-    $ret .= add_field('<input type="text" name="rordb_create_color" value="'.$items[4].'">', 'Color');
+    // Color
+    $ret .= add_field('<input type="text" name="rordb_create_color" value="'.$items[2].'">', 'Color');
 
-    $ret .= add_field('<input type="text" name="rordb_create_size" value="'.$items[5].'">', 'Size');
+    // Size
+    $ret .= add_field('<input type="text" name="rordb_create_size" value="'.$items[3].'">', 'Size');
 
-    $ret .= add_field('<input type="text" name="rordb_create_amount" value="'.$items[6].'">', 'Amount');
+    // Amount
+    $ret .= add_field('<input type="text" name="rordb_create_amount" value="'.$items[4].'">', 'Amount');
 
-    $ret .= add_field('<textarea name="rordb_create_comments" rows="10">'.$items[7].'</textarea>', 'Comments');
+    // Comments
+    $ret .= add_field('<textarea name="rordb_create_comments" rows="10">'.$items[5].'</textarea>', 'Comments');
 
-    $ret .= add_field('<input type="text" name="rordb_create_claimed" value="'.$items[11].'">', 'Claimed');
+    // Claimed
+    $claimgroups = '';
+    $db->hier_execute_recursive("Claimgroups",function($c, $lvl, &$items, &$ret){
+        $name = $c["name"];
+        $id = $c["id"];
+        $indent = str_repeat("----", $lvl);
+        $ret .= "<option value='".$name."' ";
+        if($name==$items[13]) $ret .= 'selected';
+        $ret .= ">".$indent.$name."</option>";
+    }, $items, $claimgroups);
+    $ret .= add_field('<select name="rordb_create_claimed">'.$claimgroups.'</select>', 'Claimed');
 
+    // Hidden
     $hidden = '';
-    if($items[12]=='1') $hidden = 'checked';
+    if($items[8]=='1') $hidden = 'checked';
     $ret .= add_field('<input type="checkbox" name="rordb_create_hidden" '.$hidden.'>', "Hidden");
 
+    // Image
     $ret .= add_field('
         <input type="hidden" name="rordb_create_img" id="rordb_create_img">
-                    <img id="rordb_imgtest" width=200 src="https://drive.google.com/thumbnail?id='.$items[10].'&sz=w200-h200"><br>
+                    <img id="rordb_imgtest" width=200 src="https://drive.google.com/thumbnail?id='.$items[6].'&sz=w200-h200"><br>
         <input type="file" accept="image/*" id="rordb_file_imgtest" onchange=\'javscript:rordb_put_imgcontent_in_img("rordb_file_imgtest", "rordb_imgtest", "rordb_create_img")\'>
     ', "Image");
 

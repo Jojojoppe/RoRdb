@@ -2,14 +2,15 @@
 /*
 Plugin Name: RoRdb
 Plugin URI: https://github.com/Jojojoppe/RoRdb
-Version: 0.0.10
+Version: 0.1.0
 License: BSD-2
 Author: Joppe Blondel
 Author URI: https://github.com/Jojojoppe
 Description: Room of Requirements (RoR) database using Google drive and sheets
 Requires PHP: 7
+GitHub Plugin URI: Jojojoppe/RoRdb
 
-Copyright (c) 2021, Joppe Blondel
+Copyright (c) 2022, Joppe Blondel
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions are met:
@@ -36,7 +37,7 @@ if(!defined('WPINC')){
 	die;
 }
 
-define("RORDB_VERSION", "0.0.10");
+define("RORDB_VERSION", "0.1.0");
 
 // Google stuff
 require_once plugin_dir_path(__FILE__)."third_party/google-api-php-client--PHP8.0/vendor/autoload.php";
@@ -84,3 +85,11 @@ function rordb_deactivation(){
    rordb_users_deinit();
 }
 register_deactivation_hook(__FILE__, "rordb_deactivation");
+
+// Wordpress updater scripts
+require_once plugin_dir_path(__FILE__)."third_party/wp-updater-master/src/updater.php";
+require_once plugin_dir_path(__FILE__)."third_party/wp-updater-master/src/plugin-updater.php";
+require_once plugin_dir_path(__FILE__)."third_party/wp-updater-master/src/theme-updater.php";
+require_once plugin_dir_path(__FILE__)."third_party/wp-updater-master/src/boot.php";
+$updater = MakeitWorkPress\WP_Updater\Boot::instance();
+$updater->add(['type' => 'plugin', 'source' => 'https://github.com/Jojojoppe/RoRdb']);
