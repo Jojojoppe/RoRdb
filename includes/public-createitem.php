@@ -76,7 +76,7 @@ function rordb_public_createitem_main(){
 
     $ret .= '<h2>Create item</h2><div role="form" class="wpcf7"><form acttion="" method="post" class="wpcf7">';
 
-    $ret .= add_field('<input type="text" name="rordb_create_name" class="wpcf7-form-control wpcf7-text">', "Category name");
+    $ret .= add_field('<input type="text" name="rordb_create_name" class="wpcf7-form-control wpcf7-text">', "Item name");
 
     $categories = '';
     $db->categories_execute_recursive(function($c, $lvl, &$p){

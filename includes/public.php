@@ -11,6 +11,7 @@ function rordb_public_render_menu($button_class, $link_class){
     $ret .= "<a href='?page_id=".$pageid."&rordb_action=createitem'>Create new item</a><br>";
     $ret .= "<a href='?page_id=".$pageid."&rordb_action=categories'>Edit categories</a><br>";
     $ret .= "<a href='?page_id=".$pageid."&rordb_action=locations'>Edit locations</a><br>";
+    $ret .= "<a href='?page_id=".$pageid."&rordb_action=claimgroups'>Edit claim groups</a><br>";
 
     return $ret;
 }
@@ -31,6 +32,9 @@ function rordb_public_render_sidebar(){
 
     }elseif($action=="locations"){
         $ret .= rordb_public_locations_sidebar();
+
+    }elseif($action=="claimgroups"){
+        $ret .= rordb_public_claimgroups_sidebar();
 
     }elseif($action=="items"){
         $ret .= rordb_public_items_sidebar();
@@ -68,6 +72,9 @@ function rordb_public_render_main(){
 
     }elseif($action=="items"){
         $ret .= rordb_public_items_main();
+
+    }elseif($action=="claimgroups"){
+        $ret .= rordb_public_claimgroups_main();
 
     }elseif($action=="createitem"){
         $ret .= rordb_public_createitem_main();

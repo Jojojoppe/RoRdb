@@ -1,6 +1,6 @@
 <?php
 
-function rordb_public_locations_sidebar(){
+function rordb_public_claimgroups_sidebar(){
     $ret = "";
 
     // MENU
@@ -13,20 +13,20 @@ function rordb_public_locations_sidebar(){
     }
 
     // CHeck for right permissions
-    if(!rordb_can_user_view_locations()){
+    if(!rordb_can_user_view_claimgroups()){
         rordb_error("You don't have permission to view locations", "error");
         return rordb_show_errors();
     }
 
-    $ret .= rordb_public_hier_edit_sidebar("Locations",
-        rordb_can_user_create_locations(),
-        rordb_can_user_edit_locations(),
-        "Locations");
+    $ret .= rordb_public_hier_edit_sidebar("Claimgroups",
+        rordb_can_user_create_claimgroups(),
+        rordb_can_user_edit_claimgroups(),
+        "Claim Groups");
 
     return $ret;
 }
 
-function rordb_public_locations_main(){
+function rordb_public_claimgroups_main(){
     $ret = "";
 
     // Check for valid database
@@ -35,10 +35,10 @@ function rordb_public_locations_main(){
         return rordb_show_errors();
     }
 
-    $ret .= rordb_public_hier_main("Locations",
-        rordb_can_user_edit_locations(),
-        rordb_can_user_create_locations(),
-        "Location", "Locations");
+    $ret .= rordb_public_hier_main("Claimgroups",
+        rordb_can_user_edit_claimgroups(),
+        rordb_can_user_create_claimgroups(),
+        "Claim Group", "Claim Groups");
 
     return $ret;
 }

@@ -1,18 +1,5 @@
 <?php
 
-// function rordb_create_options_menu(){
-// 	add_submenu_page(
-//         "rordb",                                // parent slug
-//         "Settings",   		                    // page title
-//         "Settings",                             // menu title
-//         "read",                                 // capability
-//         "rordb_settings",	                    // menu slug
-//         "rordb_options_page_html"  				// callable
-//         // position
-//     );
-// }
-// add_action('admin_menu', 'rordb_create_options_menu');
-
 function rordb_admin_menu(){
 	add_menu_page(
 		"RoRdb settings", 				// page title
@@ -25,6 +12,13 @@ function rordb_admin_menu(){
 	);
 }
 add_action('admin_menu', 'rordb_admin_menu');
+
+// Add javascript
+function rordb_options_page_javascript(){
+	wp_register_script('rordb_settings_fields', plugins_url('../resources/js/settings_fields.js', __FILE__), []);
+    wp_enqueue_script('rordb_settings_fields');
+}
+add_action('admin_menu', 'rordb_options_page_javascript');
 
 function rordb_options_page_html(){
 	if(!rordb_can_user_edit_settings()){

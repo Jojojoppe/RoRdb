@@ -6,6 +6,8 @@ class RordbDatabase{
 	public $folder;
 	public $sheet;
 
+	private $hier = ["Categories"=>1, "Locations"=>2, "Claimgroups"=>3];
+
 	function __construct(){
 		try{
 			$this->api = new RordbGoogleApi();
@@ -15,6 +17,7 @@ class RordbDatabase{
 			$this->error(__FUNCTION__.": ".$e->getMessage());
 			$this->error('Could not connect with Google API. Check the service account key file! After correct key file is provided reload the database');
 			update_option('rordb_valid_database', false);
+			die;
 		}
 	}
 
@@ -69,7 +72,7 @@ class RordbDatabase{
 			update_option('rordb_sheet_id', $sheetid);
 
 			// Check database version
-			$version = $this->api->sheets_get_range($sheetid, "Info", "B4")[0][0];
+			$version = $this->api->sheets_get_range($sheetid, "Info", "D2")[0][0];
 			$majorexpectedversion = explode('.', RORDB_VERSION)[0];
 			if($version!=$majorexpectedversion){
 				update_option('rordb_drive_id', '');
@@ -88,6 +91,22 @@ class RordbDatabase{
 		}catch(Exception $e){
 			$this->error(__FUNCTION__.": ".$e->getMessage());
 		}
+	}
+
+	// ONLY RUN WHILE CREATING DATABASE!!!
+	function create_hier($name, $sheetid){
+		$this->api->sheets_create_sheet($sheetid, $name);
+		$this->api->sheets_put_range($sheetid, $name, "A1", [
+			["ID", "Name", "Parent", "Parent ID", "Parent ID list", "Parent name list", "Child name list", "Child ID list", "Search tags", "Search tags ID"]
+		]);
+		$this->api->sheets_put_range($sheetid, "Info", "A".$this->hier[$name],[
+			["Nr ".$name, "=COUNT(".$name."!A2:A)"],
+		]);
+		// Create column in ITEMS tab from col I (J is the first)
+		$abc = ['J', 'K', 'L', 'M', 'N', 'O', 'P'];
+		$this->api->sheets_put_range($sheetid, "Items", $abc[($this->hier[$name]-1)*2]."1", [
+			[$name, $name.' tags']
+		]);
 	}
 
 	function create_database(){
@@ -120,32 +139,34 @@ class RordbDatabase{
 			// Create info tab
 			$this->api->sheets_create_sheet($sheetid, "Info");
 			$this->api->sheets_delete_sheet($sheetid, 0);
-			$this->api->sheets_create_sheet($sheetid, "Categories");
-			$this->api->sheets_create_sheet($sheetid, "Locations");
+
+			// Create items tab
 			$this->api->sheets_create_sheet($sheetid, "Items");
+			$this->api->sheets_put_range($sheetid, "Items", "A1", [
+				["ID", "Name", "Color", "Size", "Amount", "Comments", "Image", "Claimed", "Hidden"]
+			]);
+
+			// Create 3 hierarchical tabs
+			foreach($this->hier as $k=>$v){
+				$this->create_hier($k, $sheetid);
+			}
+
+			// Categories
+			$this->put_hier("All", "", "Categories");
+			$this->put_hier("None", "", "Categories");
+
+			// Locations
+			$this->put_hier("All", "", "Locations");
+			$this->put_hier("None", "", "Locations");
+
+			// Claim groups
+			$this->put_hier("All", "", "Claimgroups");
+			$this->put_hier("None", "", "Claimgroups");
 
 			$majorexpectedversion = explode('.', RORDB_VERSION)[0];
-			$this->api->sheets_put_range($sheetid, "Info", "A1",[
-				["Nr categories", "=COUNT(Categories!A2:A)"],
-				["Nr locations", "=COUNT(Locations!A2:A)"],
+			$this->api->sheets_put_range($sheetid, "Info", "C1",[
 				["Nr items", "=COUNT(Items!A2:A)"],
 				["Database version", $majorexpectedversion]
-			]);
-
-			$this->api->sheets_put_range($sheetid, "Categories", "A1", [
-				["ID", "Name", "Parent", "Parent ID", "Parent ID list", "Parent name list", "Child name list", "Child ID list", "Search tags", "Search tags ID"]
-			]);
-			$this->put_category("All", "");
-			$this->put_category("None", "");
-
-			$this->api->sheets_put_range($sheetid, "Locations", "A1", [
-				["ID", "Name", "Parent", "Parent ID", "Parent ID list", "Parent name list", "Child name list", "Child ID list", "Search tags", "Search tags ID"]
-			]);
-			$this->put_location("All", "");
-			$this->put_location("None", "");
-
-			$this->api->sheets_put_range($sheetid, "Items", "A1", [
-				["ID", "Name", "Category", "Location", "Color", "Size", "Amount", "Comments", "Category tags", "Location tags", "Image", "Claimed", "Hidden"]
 			]);
 
 			update_option('rordb_valid_database', true);
@@ -176,24 +197,23 @@ class RordbDatabase{
 		}
 	}
 
+
+	// -----------------------------------------------
+	// Hierarchical things like categories, locations and claim groups
 	// -----------------------------------------------
 
-
-	// Categories
-	// ----------
-
-	function put_category($name, $parent){
+	function put_hier($name, $parent, $tab){
 		try{
 
 			// See if empty slots can be used
 			$query = "select * where B=''";
-			$ret = $this->db_query($query, "Categories");
+			$ret = $this->db_query($query, $tab);
 
 			// Get ID of next category
 			if(sizeof($ret)>0){
 				$next_id = $ret[0][0];
 			}else{
-				$next_id = $this->api->sheets_get_range($this->sheet, "Info", "B1")[0][0];
+				$next_id = $this->api->sheets_get_range($this->sheet, "Info", "B".$this->hier[$tab])[0][0];
 			}
 
 			$row = $next_id+2;
@@ -201,7 +221,7 @@ class RordbDatabase{
 			$range = "A".$row;
 
 			// Put into sheet
-			$this->api->sheets_put_range($this->sheet, "Categories", $range, [
+			$this->api->sheets_put_range($this->sheet, $tab, $range, [
 				[$next_id, $name, $parent,
 					"=IFERROR(VLOOKUP(C$row, {B2:B, A2:A}, 2, FALSE), \"\")",											// Parent name
 					"=IFERROR(CONCATENATE(A$row, \",\", VLOOKUP(D$row, A2:E, 5, TRUE)), A$row)",							// Parent ID list
@@ -217,11 +237,11 @@ class RordbDatabase{
 		}
 	}
 
-	function get_category($id){
+	function get_hier($id, $tab){
 		try{
 			$row = $id+2;
 			$range = "A$row:J";
-			$cat = $this->api->sheets_get_range($this->sheet, "Categories", $range)[0];
+			$cat = $this->api->sheets_get_range($this->sheet, $tab, $range)[0];
 			return [
 				'id' => $cat[0],
 				'name' => $cat[1],
@@ -234,15 +254,15 @@ class RordbDatabase{
 		}
 	}
 
-	function get_categories(){
+	function get_hier_list($tab){
 		try{
-			// Get ID of next category to get amount of categories
-			$next_id = $this->api->sheets_get_range($this->sheet, "Info", "B1")[0][0];
+			// Get ID of next hier to get amount of hier
+			$next_id = $this->api->sheets_get_range($this->sheet, "Info", "B".$this->hier[$tab])[0][0];
 			// Get last row
 			$row = $next_id+1;
 			// Calculate range of table
 			$range = "A2:J$row";
-			$table = $this->api->sheets_get_range($this->sheet, "Categories", $range);
+			$table = $this->api->sheets_get_range($this->sheet, $tab, $range);
 
 			$childlist = array();
 			foreach($table as $row){
@@ -260,17 +280,17 @@ class RordbDatabase{
 				$childlist[$row[0]] =  $c;
 			}
 
-			$tree = [$this->generate_tree_categories_locations($childlist, 0), $this->generate_tree_categories_locations($childlist, 1)];
+			$tree = [$this->generate_tree_hier($childlist, 0), $this->generate_tree_hier($childlist, 1)];
 
 			return [$tree, $childlist];
 		}catch(Exception $e){
-			$this->error(__FUNCTION__.": ".$e->getMessage());
+			$this->error(__FUNCTION__.": ".$e->getMessage()." ".$this->hier);
 		}
 	}
 
-	function update_category($id, $name, $parent){
+	function update_hier($id, $name, $parent, $tab){
 		try{
-			$res = $this->get_categories();
+			$res = $this->get_hier_list($tab);
 			$categories_flat = $res[1];
 			
 			// Check if new name
@@ -283,11 +303,11 @@ class RordbDatabase{
 			// If new name update all the children with id as parent
 			if($newname){
 				$query = "select * where C='".$categories_flat[$id]["name"]."'";
-				$ret = $this->db_query($query, "Categories");
+				$ret = $this->db_query($query, $tab);
 				foreach($ret as $c){
 					// Get starting range of category
 					$range = "C".($c[0]+2);
-					$this->api->sheets_put_range($this->sheet, "Categories", $range, [
+					$this->api->sheets_put_range($this->sheet, $tab, $range, [
 						[$name]
 					], false);	
 				}
@@ -295,228 +315,64 @@ class RordbDatabase{
 		
 			// Update category
 			$range = "B".($id+2);
-			$this->api->sheets_put_range($this->sheet, "Categories", $range, [
+			$this->api->sheets_put_range($this->sheet, $tab, $range, [
 				[$name, $parent]
 			], false);	
 
+			// TODO FIXME
 			// Change name of category of items placed in this category
-			$query = "select * where C='".$categories_flat[$id]['name']."'";
-			$ret = $this->db_query($query, "Items");
-			foreach($ret as $i){
-				$range = "C".($i[0]+2);
-				$this->api->sheets_put_range($this->sheet, "Items", $range, [
-					[$name]
-				], false);
-			}
+			// $query = "select * where C='".$categories_flat[$id]['name']."'";
+			// $ret = $this->db_query($query, "Items");
+			// foreach($ret as $i){
+			// 	$range = "C".($i[0]+2);
+			// 	$this->api->sheets_put_range($this->sheet, "Items", $range, [
+			// 		[$name]
+			// 	], false);
+			// }
 
 		}catch(Exception $e){
 			$this->error(__FUNCTION__.": ".$e->getMessage());
 		}
 	}
 
-	function delete_category($id){
+	function delete_hier($id, $tab){
 		try{
-			$res = $this->get_categories();
+			$res = $this->get_hier_list($tab);
 			$categories_flat = $res[1];
 
-			// Update all the children with id as parent -> set to parent of deleted category
-			$query = "select * where C='".$categories_flat[$id]["name"]."'";
-			$ret = $this->db_query($query, "Categories");
-			foreach($ret as $c){
-				$this->update_category($c[0], $c[1], $categories_flat[$id]["parent"]);
-			}
+			// TODO FIXME
+			// // Update all the children with id as parent -> set to parent of deleted category
+			// $query = "select * where C='".$categories_flat[$id]["name"]."'";
+			// $ret = $this->db_query($query, "Categories");
+			// foreach($ret as $c){
+			// 	$this->update_category($c[0], $c[1], $categories_flat[$id]["parent"]);
+			// }
 		
 			// Update category
 			$range = "B".($id+2);
-			$this->api->sheets_put_range($this->sheet, "Categories", $range, [
+			$this->api->sheets_put_range($this->sheet, $tab, $range, [
 				["", "", "", "", "", "", "", "", ""]
 			], false);	
 
-			// Update items in this category to None
-			$query = "select * where C='".$categories_flat[$id]['name']."'";
-			$ret = $this->db_query($query, "Items");
-			foreach($ret as $i){
-				$range = "C".($i[0]+2);
-				$this->api->sheets_put_range($this->sheet, "Items", $range, [
-					["None"]
-				], false);
-			}
+			// TODO FIXME
+			// // Update items in this category to None
+			// $query = "select * where C='".$categories_flat[$id]['name']."'";
+			// $ret = $this->db_query($query, "Items");
+			// foreach($ret as $i){
+			// 	$range = "C".($i[0]+2);
+			// 	$this->api->sheets_put_range($this->sheet, "Items", $range, [
+			// 		["None"]
+			// 	], false);
+			// }
 
 		}catch(Exception $e){
 			$this->error(__FUNCTION__.": ".$e->getMessage());
 		}
 	}
 
-	// Locations
-	// ---------
-
-	function put_location($name, $parent){
-		try{
-
-			// See if empty slots can be used
-			$query = "select * where B=''";
-			$ret = $this->db_query($query, "Locations");
-
-			// Get ID of next category
-			if(sizeof($ret)>0){
-				$next_id = $ret[0][0];
-			}else{
-				$next_id = $this->api->sheets_get_range($this->sheet, "Info", "B2")[0][0];
-			}
-
-			$row = $next_id+2;
-			// Get start cell of new row
-			$range = "A".$row;
-
-			// Put into sheet
-			$this->api->sheets_put_range($this->sheet, "Locations", $range, [
-				[$next_id, $name, $parent,
-					"=IFERROR(VLOOKUP(C$row, {B2:B, A2:A}, 2, FALSE), \"\")",											// Parent name
-					"=IFERROR(CONCATENATE(A$row, \",\", VLOOKUP(D$row, A2:E, 5, TRUE)), A$row)",							// Parent ID list
-					"=IFERROR(CONCATENATE(B$row, \",\", VLOOKUP(D$row, A2:F, 6, TRUE)), B$row)",							// Parent name list
-					"=IFERROR(CONCATENATE(TEXTJOIN(\",\", TRUE, TRANSPOSE(FILTER(B2:B, C2:C=B$row))), \",\"), \"\")",	// Child name list
-					"=IFERROR(CONCATENATE(TEXTJOIN(\",\", TRUE, TRANSPOSE(FILTER(A2:A, C2:C=B$row))), \",\"), \"\")",	// Child ID list
-					"=CONCATENATE(IFERROR(VLOOKUP(D$row, A$2:I, 9, TRUE), \"\"), \",\", B$row, \",\")",					// Search tags
-					"=CONCATENATE(IFERROR(VLOOKUP(D$row, A$2:J, 10, TRUE), \"\"), \",\", A$row, \",\")",				// Search tags I
-				]
-			], false);
-		}catch(Exception $e){
-			$this->error(__FUNCTION__.": ".$e->getMessage());
-		}
-	}
-
-	function get_location($id){
-		try{
-			$row = $id+2;
-			$range = "A$row:J";
-			$cat = $this->api->sheets_get_range($this->sheet, "Locations", $range)[0];
-			return [
-				'id' => $cat[0],
-				'name' => $cat[1],
-				'parent' => $cat[2],
-				'parentid' => $cat[3],
-				'parents' => $cat[4]
-			];
-		}catch(Exception $e){
-			$this->error(__FUNCTION__.": ".$e->getMessage());
-		}
-	}
-
-	function get_locations(){
-		try{
-			// Get ID of next location to get amount of locations
-			$next_id = $this->api->sheets_get_range($this->sheet, "Info", "B2")[0][0];
-			// Get last row
-			$row = $next_id+1;
-			// Calculate range of table
-			$range = "A2:J$row";
-			$table = $this->api->sheets_get_range($this->sheet, "Locations", $range);
-
-			$childlist = array();
-			foreach($table as $row){
-				// Skip deleted locations
-				if(!array_key_exists(1, $row)) continue;
-				$c = [
-					'id'=>$row[0],
-					'name'=>$row[1],
-					'parent'=>$row[2],
-					'parentId'=>$row[3],
-					'childs'=>explode(',', $row[7]),
-					'parents'=>explode(',', $row[4])
-				];
-				array_pop($c["childs"]);
-				$childlist[$row[0]] =  $c;
-			}
-
-			$tree = [$this->generate_tree_categories_locations($childlist, 0), $this->generate_tree_categories_locations($childlist, 1)];
-
-			return [$tree, $childlist];
-		}catch(Exception $e){
-			$this->error(__FUNCTION__.": ".$e->getMessage());
-		}
-	}
-
-	function update_location($id, $name, $parent){
-		try{
-			$res = $this->get_locations();
-			$locations_flat = $res[1];
-			
-			// Check if new name
-			$newname = false;
-			if($locations_flat[$id]["name"]!=$name) $newname=true;
-			// Check if new parent
-			$newparent = false;
-			if($locations_flat[$id]["parent"]!=$parent) $newparent=true;
-		
-			// If new name update all the children with id as parent
-			if($newname){
-				$query = "select * where C='".$locations_flat[$id]["name"]."'";
-				$ret = $this->db_query($query, "Locations");
-				foreach($ret as $c){
-					// Get starting range of location
-					$range = "C".($c[0]+2);
-					$this->api->sheets_put_range($this->sheet, "Locations", $range, [
-						[$name]
-					], false);	
-				}
-			}
-		
-			// Update location
-			$range = "B".($id+2);
-			$this->api->sheets_put_range($this->sheet, "Locations", $range, [
-				[$name, $parent]
-			], false);	
-
-			// Change name of location of items placed in this location
-			$query = "select * where D='".$locations_flat[$id]['name']."'";
-			$ret = $this->db_query($query, "Items");
-			foreach($ret as $i){
-				$range = "D".($i[0]+2);
-				$this->api->sheets_put_range($this->sheet, "Items", $range, [
-					[$name]
-				], false);
-			}
-
-		}catch(Exception $e){
-			$this->error(__FUNCTION__.": ".$e->getMessage());
-		}
-	}
-
-	function delete_location($id){
-		try{
-			$res = $this->get_locations();
-			$locations_flat = $res[1];
-
-			// Update all the children with id as parent -> set to parent of deleted location
-			$query = "select * where C='".$locations_flat[$id]["name"]."'";
-			$ret = $this->db_query($query, "Locations");
-			foreach($ret as $c){
-				$this->update_location($c[0], $c[1], $locations_flat[$id]["parent"]);
-			}
-		
-			// Update location
-			$range = "B".($id+2);
-			$this->api->sheets_put_range($this->sheet, "Locations", $range, [
-				["", "", "", "", "", "", "", "", ""]
-			], false);	
-
-			// Put items in location to None
-			$query = "select * where D='".$locations_flat[$id]['name']."'";
-			$ret = $this->db_query($query, "Items");
-			foreach($ret as $i){
-				$range = "D".($i[0]+2);
-				$this->api->sheets_put_range($this->sheet, "Items", $range, [
-					["None"]
-				], false);
-			}
-
-		}catch(Exception $e){
-			$this->error(__FUNCTION__.": ".$e->getMessage());
-		}
-	}
-
+	// -----------------------------------------------
 	// Items
-	// -----
+	// -----------------------------------------------
 
 	function put_item($name, $category, $location, $color, $size, $amount, $comments, $image, $claimed, $hidden){
 		try{
@@ -634,8 +490,9 @@ class RordbDatabase{
 		return $res;
 	}
 
+	// -----------------------------------------------
 	// DB connection functions
-	// -----------------------
+	// -----------------------------------------------
 
 	function encodeURIComponent($str){
 		$revert = array('%21'=>'!', '%2A'=>'*', '%27'=>"'", '%28'=>'(', '%29'=>')');
@@ -679,7 +536,7 @@ class RordbDatabase{
 	// Helper functions
 	// ----------------
 
-	function generate_tree_categories_locations(&$childlist, $id){
+	function generate_tree_hier(&$childlist, $id){
 		$ret = [
 			"id" => $id,
 			"name" => $childlist[$id]["name"],
@@ -688,7 +545,7 @@ class RordbDatabase{
 			"parents" => $childlist[$id]["parents"]
 		];
 		foreach($childlist[$id]["childs"] as $c){
-			$cret = $this->generate_tree_categories_locations($childlist, $c);
+			$cret = $this->generate_tree_hier($childlist, $c);
 			array_push($ret["childs"], $cret);
 			$ret['allchilds'] = $ret['allchilds'].",".$cret['allchilds'];
 		}
@@ -702,20 +559,10 @@ class RordbDatabase{
 		}
 	}
 
-	// Traverses the categories recursively and calls func($category, $level)
-	function categories_execute_recursive($func, &$e=null, &$e2=null){
+	// Traverses the hier recursively and calls func($location, $level)
+	function hier_execute_recursive($tab, $func, &$e=null, &$e2=null){
 		try{
-			$categories = $this->get_categories()[0];
-			$this->execute_recursive_($categories, 0, $func, $e, $e2);
-		}catch(Exception $e){
-			$this->error(__FUNCTION__.": ".$e->getMessage());
-		}
-	}
-
-	// Traverses the locations recursively and calls func($location, $level)
-	function locations_execute_recursive($func, &$e=null, &$e2=null){
-		try{
-			$locations = $this->get_locations()[0];
+			$locations = $this->get_hier_list($tab)[0];
 			$this->execute_recursive_($locations, 0, $func, $e, $e2);
 		}catch(Exception $e){
 			$this->error(__FUNCTION__.": ".$e->getMessage());

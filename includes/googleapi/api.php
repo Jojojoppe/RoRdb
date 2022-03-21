@@ -11,7 +11,7 @@ class RordbGoogleApi{
 		$jsonkeystring = get_option('rordb_service_account_key');
 		$jsonkey = json_decode($jsonkeystring, true);
 		if(is_null($jsonkey)){
-			throw new Exception(__FUNCTION__.": Could not decode JSON file");
+			throw new Exception(__FUNCTION__.": Could not decode JSON file: ".$jsonkeystring);
 		}
 		try{
 			$this->serviceaccount = $jsonkey["client_email"];

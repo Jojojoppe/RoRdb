@@ -49,6 +49,18 @@ function rordb_public_home_sidebar(){
     if(rordb_can_user_edit_locations()) $ret .= " checked";
     $ret .= "> Edit RoRdb locations<br>";
 
+    $ret .= "<input type='checkbox' disabled";
+    if(rordb_can_user_view_claimgroups()) $ret .= " checked";
+    $ret .= "> View RoRdb claim groups<br>";
+
+    $ret .= "<input type='checkbox' disabled";
+    if(rordb_can_user_create_claimgroups()) $ret .= " checked";
+    $ret .= "> Create RoRdb claim groups<br>";
+
+    $ret .= "<input type='checkbox' disabled";
+    if(rordb_can_user_edit_claimgroups()) $ret .= " checked";
+    $ret .= "> Edit RoRdb claim groups<br>";
+
     // Display WIP notice
     $ret .= "<hr>WARNING: RoRdb is still WIP! Not everything will work as expected and not all planned functionality is implemented.";
 

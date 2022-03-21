@@ -17,12 +17,17 @@ function rordb_users_init(){
         "rordb_view_locations"=>true,
         "rordb_edit_locations"=>true,
         "rordb_create_locations"=>true,
+
+        "rordb_view_claimgroups"=>true,
+        "rordb_edit_claimgroups"=>true,
+        "rordb_create_claimgroups"=>true,
     ]);
 
     wp_roles()->add_role("rordb_viewer", "RoRdb viewer", [
         "rordb_view_items"=>true,
         "rordb_view_categories"=>true,
         "rordb_view_locations"=>true,
+        "rordb_view_claimgroups"=>true,
     ]);
 
     // Add capabilities to administrator
@@ -40,6 +45,10 @@ function rordb_users_init(){
     $admin->add_cap("rordb_view_locations", true);
     $admin->add_cap("rordb_edit_locations", true);
     $admin->add_cap("rordb_create_locations", true);
+
+    $admin->add_cap("rordb_view_claimgroups", true);
+    $admin->add_cap("rordb_edit_claimgroups", true);
+    $admin->add_cap("rordb_create_claimgroups", true);
 }
 
 // Deinitialize user stuff
@@ -59,6 +68,10 @@ function rordb_users_deinit(){
     $admin->remove_cap("rordb_view_locations");
     $admin->remove_cap("rordb_edit_locations");
     $admin->remove_cap("rordb_create_locations");
+
+    $admin->remove_cap("rordb_view_claimgroups");
+    $admin->remove_cap("rordb_edit_claimgroups");
+    $admin->remove_cap("rordb_create_claimgroups");
 
     wp_roles()->remove_role("rordb");
     wp_roles()->remove_role("rordb_viewer");
@@ -84,6 +97,10 @@ function rordb_register_cap_groups() {
                 "rordb_view_locations",
                 "rordb_edit_locations",
                 "rordb_create_locations",
+
+                "rordb_view_claimgroups",
+                "rordb_edit_claimgroups",
+                "rordb_create_claimgroups",
             ),
 			'icon'     => 'dashicons-database',
 			'priority' => 10
@@ -128,4 +145,20 @@ function rordb_can_user_edit_locations(){
 
 function rordb_can_user_create_locations(){
     return current_user_can('rordb_create_locations');
+}
+
+function rordb_can_user_edit_settings(){
+    return current_user_can('rordb_edit_settings');
+}
+
+function rordb_can_user_view_claimgroups(){
+    return current_user_can('rordb_view_claimgroups');
+}
+
+function rordb_can_user_edit_claimgroups(){
+    return current_user_can('rordb_edit_claimgroups');
+}
+
+function rordb_can_user_create_claimgroups(){
+    return current_user_can('rordb_create_claimgroups');
 }
