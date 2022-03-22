@@ -17,7 +17,6 @@ class RordbDatabase{
 			$this->error(__FUNCTION__.": ".$e->getMessage());
 			$this->error('Could not connect with Google API. Check the service account key file! After correct key file is provided reload the database');
 			update_option('rordb_valid_database', false);
-			die;
 		}
 	}
 

@@ -39,7 +39,7 @@ if(!defined('WPINC')){
 define("RORDB_VERSION", "0.1.0");
 
 // Google stuff
-require_once plugin_dir_path(__FILE__)."third_party/google-api-php-client--PHP8.0/vendor/autoload.php";
+require_once plugin_dir_path(__FILE__)."vendor/autoload.php";
 require_once plugin_dir_path(__FILE__)."includes/googleapi/api.php";
 // RoRdb database interface
 require_once plugin_dir_path(__FILE__)."includes/database/database.php";
@@ -84,11 +84,3 @@ function rordb_deactivation(){
    rordb_users_deinit();
 }
 register_deactivation_hook(__FILE__, "rordb_deactivation");
-
-// Wordpress updater scripts
-require_once plugin_dir_path(__FILE__)."third_party/wp-updater-master/src/updater.php";
-require_once plugin_dir_path(__FILE__)."third_party/wp-updater-master/src/plugin-updater.php";
-require_once plugin_dir_path(__FILE__)."third_party/wp-updater-master/src/theme-updater.php";
-require_once plugin_dir_path(__FILE__)."third_party/wp-updater-master/src/boot.php";
-$updater = MakeitWorkPress\WP_Updater\Boot::instance();
-$updater->add(['type' => 'plugin', 'source' => 'https://github.com/Jojojoppe/RoRdb']);
