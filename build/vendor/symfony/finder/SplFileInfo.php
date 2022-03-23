@@ -17,8 +17,8 @@ namespace RoRdb\Symfony\Component\Finder;
  */
 class SplFileInfo extends \SplFileInfo
 {
-    private string $relativePath;
-    private string $relativePathname;
+    private $relativePath;
+    private $relativePathname;
     /**
      * @param string $file             The file name
      * @param string $relativePath     The relative path
@@ -34,8 +34,10 @@ class SplFileInfo extends \SplFileInfo
      * Returns the relative path.
      *
      * This path does not contain the file name.
+     *
+     * @return string
      */
-    public function getRelativePath() : string
+    public function getRelativePath()
     {
         return $this->relativePath;
     }
@@ -43,8 +45,10 @@ class SplFileInfo extends \SplFileInfo
      * Returns the relative path name.
      *
      * This path contains the file name.
+     *
+     * @return string
      */
-    public function getRelativePathname() : string
+    public function getRelativePathname()
     {
         return $this->relativePathname;
     }
@@ -56,9 +60,11 @@ class SplFileInfo extends \SplFileInfo
     /**
      * Returns the contents of the file.
      *
+     * @return string
+     *
      * @throws \RuntimeException
      */
-    public function getContents() : string
+    public function getContents()
     {
         \set_error_handler(function ($type, $msg) use(&$error) {
             $error = $msg;

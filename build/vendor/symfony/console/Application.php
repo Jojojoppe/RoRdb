@@ -11,11 +11,15 @@
 namespace RoRdb\Symfony\Component\Console;
 
 use RoRdb\Symfony\Component\Console\Command\Command;
+use RoRdb\Symfony\Component\Console\Command\CompleteCommand;
+use RoRdb\Symfony\Component\Console\Command\DumpCompletionCommand;
 use RoRdb\Symfony\Component\Console\Command\HelpCommand;
 use RoRdb\Symfony\Component\Console\Command\LazyCommand;
 use RoRdb\Symfony\Component\Console\Command\ListCommand;
 use RoRdb\Symfony\Component\Console\Command\SignalableCommandInterface;
 use RoRdb\Symfony\Component\Console\CommandLoader\CommandLoaderInterface;
+use RoRdb\Symfony\Component\Console\Completion\CompletionInput;
+use RoRdb\Symfony\Component\Console\Completion\CompletionSuggestions;
 use RoRdb\Symfony\Component\Console\Event\ConsoleCommandEvent;
 use RoRdb\Symfony\Component\Console\Event\ConsoleErrorEvent;
 use RoRdb\Symfony\Component\Console\Event\ConsoleSignalEvent;
@@ -269,7 +273,7 @@ class Application implements ResetInterface
     /**
      * Get the helper set associated with the command.
      *
-     * @return HelperSet The HelperSet instance associated with this command
+     * @return HelperSet
      */
     public function getHelperSet()
     {
@@ -285,7 +289,7 @@ class Application implements ResetInterface
     /**
      * Gets the InputDefinition related to this Application.
      *
-     * @return InputDefinition The InputDefinition instance
+     * @return InputDefinition
      */
     public function getDefinition()
     {
@@ -300,9 +304,25 @@ class Application implements ResetInterface
         return $this->definition;
     }
     /**
+     * Adds suggestions to $suggestions for the current completion input (e.g. option or argument).
+     */
+    public function complete(CompletionInput $input, CompletionSuggestions $suggestions) : void
+    {
+        if (CompletionInput::TYPE_ARGUMENT_VALUE === $input->getCompletionType() && 'command' === $input->getCompletionName()) {
+            $suggestions->suggestValues(\array_filter(\array_map(function (Command $command) {
+                return $command->isHidden() ? null : $command->getName();
+            }, $this->all())));
+            return;
+        }
+        if (CompletionInput::TYPE_OPTION_NAME === $input->getCompletionType()) {
+            $suggestions->suggestOptions($this->getDefinition()->getOptions());
+            return;
+        }
+    }
+    /**
      * Gets the help message.
      *
-     * @return string A help message
+     * @return string
      */
     public function getHelp()
     {
@@ -311,7 +331,7 @@ class Application implements ResetInterface
     /**
      * Gets whether to catch exceptions or not during commands execution.
      *
-     * @return bool Whether to catch exceptions or not during commands execution
+     * @return bool
      */
     public function areExceptionsCaught()
     {
@@ -327,7 +347,7 @@ class Application implements ResetInterface
     /**
      * Gets whether to automatically exit after a command execution or not.
      *
-     * @return bool Whether to automatically exit after a command execution or not
+     * @return bool
      */
     public function isAutoExitEnabled()
     {
@@ -343,7 +363,7 @@ class Application implements ResetInterface
     /**
      * Gets the name of the application.
      *
-     * @return string The application name
+     * @return string
      */
     public function getName()
     {
@@ -359,7 +379,7 @@ class Application implements ResetInterface
     /**
      * Gets the application version.
      *
-     * @return string The application version
+     * @return string
      */
     public function getVersion()
     {
@@ -375,7 +395,7 @@ class Application implements ResetInterface
     /**
      * Returns the long version of the application.
      *
-     * @return string The long application version
+     * @return string
      */
     public function getLongVersion()
     {
@@ -390,7 +410,7 @@ class Application implements ResetInterface
     /**
      * Registers a new command.
      *
-     * @return Command The newly created command
+     * @return Command
      */
     public function register(string $name)
     {
@@ -415,7 +435,7 @@ class Application implements ResetInterface
      * If a command with the same name already exists, it will be overridden.
      * If the command is not enabled it will not be added.
      *
-     * @return Command|null The registered command if enabled or null
+     * @return Command|null
      */
     public function add(Command $command)
     {
@@ -441,7 +461,7 @@ class Application implements ResetInterface
     /**
      * Returns a registered command by name or alias.
      *
-     * @return Command A Command object
+     * @return Command
      *
      * @throws CommandNotFoundException When given command name does not exist
      */
@@ -467,7 +487,7 @@ class Application implements ResetInterface
     /**
      * Returns true if the command exists, false otherwise.
      *
-     * @return bool true if the command exists, false otherwise
+     * @return bool
      */
     public function has(string $name)
     {
@@ -479,7 +499,7 @@ class Application implements ResetInterface
      *
      * It does not return the global namespace which always exists.
      *
-     * @return string[] An array of namespaces
+     * @return string[]
      */
     public function getNamespaces()
     {
@@ -488,17 +508,17 @@ class Application implements ResetInterface
             if ($command->isHidden()) {
                 continue;
             }
-            $namespaces = \array_merge($namespaces, $this->extractAllNamespaces($command->getName()));
+            $namespaces[] = $this->extractAllNamespaces($command->getName());
             foreach ($command->getAliases() as $alias) {
-                $namespaces = \array_merge($namespaces, $this->extractAllNamespaces($alias));
+                $namespaces[] = $this->extractAllNamespaces($alias);
             }
         }
-        return \array_values(\array_unique(\array_filter($namespaces)));
+        return \array_values(\array_unique(\array_filter(\array_merge([], ...$namespaces))));
     }
     /**
      * Finds a registered namespace by a name or an abbreviation.
      *
-     * @return string A registered namespace
+     * @return string
      *
      * @throws NamespaceNotFoundException When namespace is incorrect or ambiguous
      */
@@ -531,7 +551,7 @@ class Application implements ResetInterface
      * Contrary to get, this command tries to find the best
      * match if you give it an abbreviation of a name or alias.
      *
-     * @return Command A Command instance
+     * @return Command
      *
      * @throws CommandNotFoundException When command name is incorrect or ambiguous
      */
@@ -619,7 +639,7 @@ class Application implements ResetInterface
      *
      * The array keys are the full names and the values the command instances.
      *
-     * @return Command[] An array of Command instances
+     * @return Command[]
      */
     public function all(string $namespace = null)
     {
@@ -654,7 +674,7 @@ class Application implements ResetInterface
     /**
      * Returns an array of possible abbreviations given a set of names.
      *
-     * @return string[][] An array of abbreviations
+     * @return string[][]
      */
     public static function getAbbreviations(array $names)
     {
@@ -878,7 +898,7 @@ class Application implements ResetInterface
     /**
      * Gets the default input definition.
      *
-     * @return InputDefinition An InputDefinition instance
+     * @return InputDefinition
      */
     protected function getDefaultInputDefinition()
     {
@@ -887,16 +907,16 @@ class Application implements ResetInterface
     /**
      * Gets the default commands that should always be available.
      *
-     * @return Command[] An array of default Command instances
+     * @return Command[]
      */
     protected function getDefaultCommands()
     {
-        return [new HelpCommand(), new ListCommand()];
+        return [new HelpCommand(), new ListCommand(), new CompleteCommand(), new DumpCompletionCommand()];
     }
     /**
      * Gets the default helper set with the helpers that should always be available.
      *
-     * @return HelperSet A HelperSet instance
+     * @return HelperSet
      */
     protected function getDefaultHelperSet()
     {
@@ -914,7 +934,7 @@ class Application implements ResetInterface
      *
      * This method is not part of public API and should not be used directly.
      *
-     * @return string The namespace of the command
+     * @return string
      */
     public function extractNamespace(string $name, int $limit = null)
     {
@@ -925,7 +945,7 @@ class Application implements ResetInterface
      * Finds alternative of $name among $collection,
      * if nothing is found in $collection, try in $abbrevs.
      *
-     * @return string[] A sorted array of similar string
+     * @return string[]
      */
     private function findAlternatives(string $name, iterable $collection) : array
     {
@@ -967,7 +987,7 @@ class Application implements ResetInterface
     /**
      * Sets the default Command name.
      *
-     * @return self
+     * @return $this
      */
     public function setDefaultCommand(string $commandName, bool $isSingleCommand = \false)
     {
@@ -1018,7 +1038,7 @@ class Application implements ResetInterface
     /**
      * Returns all namespaces of the command name.
      *
-     * @return string[] The namespaces of the command
+     * @return string[]
      */
     private function extractAllNamespaces(string $name) : array
     {

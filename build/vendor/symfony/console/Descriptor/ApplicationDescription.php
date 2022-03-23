@@ -29,11 +29,11 @@ class ApplicationDescription
      */
     private $namespaces;
     /**
-     * @var Command[]
+     * @var array<string, Command>
      */
     private $commands;
     /**
-     * @var Command[]
+     * @var array<string, Command>
      */
     private $aliases;
     public function __construct(Application $application, string $namespace = null, bool $showHidden = \false)

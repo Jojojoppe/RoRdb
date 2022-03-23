@@ -30,7 +30,7 @@ class CommandNotFoundException extends \InvalidArgumentException implements Exce
         $this->alternatives = $alternatives;
     }
     /**
-     * @return string[] A list of similar defined names
+     * @return string[]
      */
     public function getAlternatives()
     {

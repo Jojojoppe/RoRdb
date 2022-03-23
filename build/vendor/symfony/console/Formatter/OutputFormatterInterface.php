@@ -22,9 +22,9 @@ interface OutputFormatterInterface
      */
     public function setDecorated(bool $decorated);
     /**
-     * Gets the decorated flag.
+     * Whether the output will decorate messages.
      *
-     * @return bool true if the output will decorate messages, false otherwise
+     * @return bool
      */
     public function isDecorated();
     /**
@@ -47,6 +47,8 @@ interface OutputFormatterInterface
     public function getStyle(string $name);
     /**
      * Formats a message according to the given styles.
+     *
+     * @return string|null
      */
     public function format(?string $message);
 }

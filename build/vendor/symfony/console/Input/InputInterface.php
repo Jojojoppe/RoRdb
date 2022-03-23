@@ -22,7 +22,7 @@ interface InputInterface
     /**
      * Returns the first argument from the raw parameters (not parsed).
      *
-     * @return string|null The value of the first argument or null otherwise
+     * @return string|null
      */
     public function getFirstArgument();
     /**
@@ -36,7 +36,7 @@ interface InputInterface
      * @param string|array $values     The values to look for in the raw parameters (can be an array)
      * @param bool         $onlyParams Only check real parameters, skip those following an end of options (--) signal
      *
-     * @return bool true if the value is contained in the raw parameters
+     * @return bool
      */
     public function hasParameterOption($values, bool $onlyParams = \false);
     /**
@@ -51,7 +51,7 @@ interface InputInterface
      * @param string|bool|int|float|array|null $default    The default value to return if no result is found
      * @param bool                             $onlyParams Only check real parameters, skip those following an end of options (--) signal
      *
-     * @return mixed The option value
+     * @return mixed
      */
     public function getParameterOption($values, $default = \false, bool $onlyParams = \false);
     /**
@@ -91,7 +91,7 @@ interface InputInterface
     /**
      * Returns true if an InputArgument object exists by name or position.
      *
-     * @return bool true if the InputArgument object exists, false otherwise
+     * @return bool
      */
     public function hasArgument(string $name);
     /**
@@ -119,7 +119,7 @@ interface InputInterface
     /**
      * Returns true if an InputOption object exists by name.
      *
-     * @return bool true if the InputOption object exists, false otherwise
+     * @return bool
      */
     public function hasOption(string $name);
     /**

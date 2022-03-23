@@ -42,34 +42,36 @@ class Finder implements \IteratorAggregate, \Countable
     public const IGNORE_VCS_FILES = 1;
     public const IGNORE_DOT_FILES = 2;
     public const IGNORE_VCS_IGNORED_FILES = 4;
-    private int $mode = 0;
-    private array $names = [];
-    private array $notNames = [];
-    private array $exclude = [];
-    private array $filters = [];
-    private array $depths = [];
-    private array $sizes = [];
-    private bool $followLinks = \false;
-    private bool $reverseSorting = \false;
-    private \Closure|int|false $sort = \false;
-    private int $ignore = 0;
-    private array $dirs = [];
-    private array $dates = [];
-    private array $iterators = [];
-    private array $contains = [];
-    private array $notContains = [];
-    private array $paths = [];
-    private array $notPaths = [];
-    private bool $ignoreUnreadableDirs = \false;
-    private static array $vcsPatterns = ['.svn', '_svn', 'CVS', '_darcs', '.arch-params', '.monotone', '.bzr', '.git', '.hg'];
+    private $mode = 0;
+    private $names = [];
+    private $notNames = [];
+    private $exclude = [];
+    private $filters = [];
+    private $depths = [];
+    private $sizes = [];
+    private $followLinks = \false;
+    private $reverseSorting = \false;
+    private $sort = \false;
+    private $ignore = 0;
+    private $dirs = [];
+    private $dates = [];
+    private $iterators = [];
+    private $contains = [];
+    private $notContains = [];
+    private $paths = [];
+    private $notPaths = [];
+    private $ignoreUnreadableDirs = \false;
+    private static $vcsPatterns = ['.svn', '_svn', 'CVS', '_darcs', '.arch-params', '.monotone', '.bzr', '.git', '.hg'];
     public function __construct()
     {
         $this->ignore = static::IGNORE_VCS_FILES | static::IGNORE_DOT_FILES;
     }
     /**
      * Creates a new Finder.
+     *
+     * @return static
      */
-    public static function create() : static
+    public static function create()
     {
         return new static();
     }
@@ -78,7 +80,7 @@ class Finder implements \IteratorAggregate, \Countable
      *
      * @return $this
      */
-    public function directories() : static
+    public function directories()
     {
         $this->mode = Iterator\FileTypeFilterIterator::ONLY_DIRECTORIES;
         return $this;
@@ -88,7 +90,7 @@ class Finder implements \IteratorAggregate, \Countable
      *
      * @return $this
      */
-    public function files() : static
+    public function files()
     {
         $this->mode = Iterator\FileTypeFilterIterator::ONLY_FILES;
         return $this;
@@ -109,7 +111,7 @@ class Finder implements \IteratorAggregate, \Countable
      * @see DepthRangeFilterIterator
      * @see NumberComparator
      */
-    public function depth(string|int|array $levels) : static
+    public function depth($levels)
     {
         foreach ((array) $levels as $level) {
             $this->depths[] = new Comparator\NumberComparator($level);
@@ -135,7 +137,7 @@ class Finder implements \IteratorAggregate, \Countable
      * @see DateRangeFilterIterator
      * @see DateComparator
      */
-    public function date(string|array $dates) : static
+    public function date($dates)
     {
         foreach ((array) $dates as $date) {
             $this->dates[] = new Comparator\DateComparator($date);
@@ -158,7 +160,7 @@ class Finder implements \IteratorAggregate, \Countable
      *
      * @see FilenameFilterIterator
      */
-    public function name(string|array $patterns) : static
+    public function name($patterns)
     {
         $this->names = \array_merge($this->names, (array) $patterns);
         return $this;
@@ -172,7 +174,7 @@ class Finder implements \IteratorAggregate, \Countable
      *
      * @see FilenameFilterIterator
      */
-    public function notName(string|array $patterns) : static
+    public function notName($patterns)
     {
         $this->notNames = \array_merge($this->notNames, (array) $patterns);
         return $this;
@@ -192,7 +194,7 @@ class Finder implements \IteratorAggregate, \Countable
      *
      * @see FilecontentFilterIterator
      */
-    public function contains(string|array $patterns) : static
+    public function contains($patterns)
     {
         $this->contains = \array_merge($this->contains, (array) $patterns);
         return $this;
@@ -212,7 +214,7 @@ class Finder implements \IteratorAggregate, \Countable
      *
      * @see FilecontentFilterIterator
      */
-    public function notContains(string|array $patterns) : static
+    public function notContains($patterns)
     {
         $this->notContains = \array_merge($this->notContains, (array) $patterns);
         return $this;
@@ -234,7 +236,7 @@ class Finder implements \IteratorAggregate, \Countable
      *
      * @see FilenameFilterIterator
      */
-    public function path(string|array $patterns) : static
+    public function path($patterns)
     {
         $this->paths = \array_merge($this->paths, (array) $patterns);
         return $this;
@@ -256,7 +258,7 @@ class Finder implements \IteratorAggregate, \Countable
      *
      * @see FilenameFilterIterator
      */
-    public function notPath(string|array $patterns) : static
+    public function notPath($patterns)
     {
         $this->notPaths = \array_merge($this->notPaths, (array) $patterns);
         return $this;
@@ -276,7 +278,7 @@ class Finder implements \IteratorAggregate, \Countable
      * @see SizeRangeFilterIterator
      * @see NumberComparator
      */
-    public function size(string|int|array $sizes) : static
+    public function size($sizes)
     {
         foreach ((array) $sizes as $size) {
             $this->sizes[] = new Comparator\NumberComparator($size);
@@ -296,7 +298,7 @@ class Finder implements \IteratorAggregate, \Countable
      *
      * @see ExcludeDirectoryFilterIterator
      */
-    public function exclude(string|array $dirs) : static
+    public function exclude($dirs)
     {
         $this->exclude = \array_merge($this->exclude, (array) $dirs);
         return $this;
@@ -310,7 +312,7 @@ class Finder implements \IteratorAggregate, \Countable
      *
      * @see ExcludeDirectoryFilterIterator
      */
-    public function ignoreDotFiles(bool $ignoreDotFiles) : static
+    public function ignoreDotFiles(bool $ignoreDotFiles)
     {
         if ($ignoreDotFiles) {
             $this->ignore |= static::IGNORE_DOT_FILES;
@@ -328,7 +330,7 @@ class Finder implements \IteratorAggregate, \Countable
      *
      * @see ExcludeDirectoryFilterIterator
      */
-    public function ignoreVCS(bool $ignoreVCS) : static
+    public function ignoreVCS(bool $ignoreVCS)
     {
         if ($ignoreVCS) {
             $this->ignore |= static::IGNORE_VCS_FILES;
@@ -344,7 +346,7 @@ class Finder implements \IteratorAggregate, \Countable
      *
      * @return $this
      */
-    public function ignoreVCSIgnored(bool $ignoreVCSIgnored) : static
+    public function ignoreVCSIgnored(bool $ignoreVCSIgnored)
     {
         if ($ignoreVCSIgnored) {
             $this->ignore |= static::IGNORE_VCS_IGNORED_FILES;
@@ -360,7 +362,7 @@ class Finder implements \IteratorAggregate, \Countable
      *
      * @param string|string[] $pattern VCS patterns to ignore
      */
-    public static function addVCSPattern(string|array $pattern)
+    public static function addVCSPattern($pattern)
     {
         foreach ((array) $pattern as $p) {
             self::$vcsPatterns[] = $p;
@@ -378,7 +380,7 @@ class Finder implements \IteratorAggregate, \Countable
      *
      * @see SortableIterator
      */
-    public function sort(\Closure $closure) : static
+    public function sort(\Closure $closure)
     {
         $this->sort = $closure;
         return $this;
@@ -392,7 +394,7 @@ class Finder implements \IteratorAggregate, \Countable
      *
      * @see SortableIterator
      */
-    public function sortByName(bool $useNaturalSort = \false) : static
+    public function sortByName(bool $useNaturalSort = \false)
     {
         $this->sort = $useNaturalSort ? Iterator\SortableIterator::SORT_BY_NAME_NATURAL : Iterator\SortableIterator::SORT_BY_NAME;
         return $this;
@@ -406,7 +408,7 @@ class Finder implements \IteratorAggregate, \Countable
      *
      * @see SortableIterator
      */
-    public function sortByType() : static
+    public function sortByType()
     {
         $this->sort = Iterator\SortableIterator::SORT_BY_TYPE;
         return $this;
@@ -422,7 +424,7 @@ class Finder implements \IteratorAggregate, \Countable
      *
      * @see SortableIterator
      */
-    public function sortByAccessedTime() : static
+    public function sortByAccessedTime()
     {
         $this->sort = Iterator\SortableIterator::SORT_BY_ACCESSED_TIME;
         return $this;
@@ -432,7 +434,7 @@ class Finder implements \IteratorAggregate, \Countable
      *
      * @return $this
      */
-    public function reverseSorting() : static
+    public function reverseSorting()
     {
         $this->reverseSorting = \true;
         return $this;
@@ -450,7 +452,7 @@ class Finder implements \IteratorAggregate, \Countable
      *
      * @see SortableIterator
      */
-    public function sortByChangedTime() : static
+    public function sortByChangedTime()
     {
         $this->sort = Iterator\SortableIterator::SORT_BY_CHANGED_TIME;
         return $this;
@@ -466,7 +468,7 @@ class Finder implements \IteratorAggregate, \Countable
      *
      * @see SortableIterator
      */
-    public function sortByModifiedTime() : static
+    public function sortByModifiedTime()
     {
         $this->sort = Iterator\SortableIterator::SORT_BY_MODIFIED_TIME;
         return $this;
@@ -481,7 +483,7 @@ class Finder implements \IteratorAggregate, \Countable
      *
      * @see CustomFilterIterator
      */
-    public function filter(\Closure $closure) : static
+    public function filter(\Closure $closure)
     {
         $this->filters[] = $closure;
         return $this;
@@ -491,7 +493,7 @@ class Finder implements \IteratorAggregate, \Countable
      *
      * @return $this
      */
-    public function followLinks() : static
+    public function followLinks()
     {
         $this->followLinks = \true;
         return $this;
@@ -503,7 +505,7 @@ class Finder implements \IteratorAggregate, \Countable
      *
      * @return $this
      */
-    public function ignoreUnreadableDirs(bool $ignore = \true) : static
+    public function ignoreUnreadableDirs(bool $ignore = \true)
     {
         $this->ignoreUnreadableDirs = $ignore;
         return $this;
@@ -517,7 +519,7 @@ class Finder implements \IteratorAggregate, \Countable
      *
      * @throws DirectoryNotFoundException if one of the directories does not exist
      */
-    public function in(string|array $dirs) : static
+    public function in($dirs)
     {
         $resolvedDirs = [];
         foreach ((array) $dirs as $dir) {
@@ -542,7 +544,8 @@ class Finder implements \IteratorAggregate, \Countable
      *
      * @throws \LogicException if the in() method has not been called
      */
-    public function getIterator() : \Iterator
+    #[\ReturnTypeWillChange]
+    public function getIterator()
     {
         if (0 === \count($this->dirs) && 0 === \count($this->iterators)) {
             throw new \LogicException('You must call one of in() or append() methods before iterating over a Finder.');
@@ -577,7 +580,7 @@ class Finder implements \IteratorAggregate, \Countable
      *
      * @throws \InvalidArgumentException when the given argument is not iterable
      */
-    public function append(iterable $iterator) : static
+    public function append(iterable $iterator)
     {
         if ($iterator instanceof \IteratorAggregate) {
             $this->iterators[] = $iterator->getIterator();
@@ -597,8 +600,10 @@ class Finder implements \IteratorAggregate, \Countable
     }
     /**
      * Check if any results were found.
+     *
+     * @return bool
      */
-    public function hasResults() : bool
+    public function hasResults()
     {
         foreach ($this->getIterator() as $_) {
             return \true;
@@ -607,8 +612,11 @@ class Finder implements \IteratorAggregate, \Countable
     }
     /**
      * Counts all the results collected by the iterators.
+     *
+     * @return int
      */
-    public function count() : int
+    #[\ReturnTypeWillChange]
+    public function count()
     {
         return \iterator_count($this->getIterator());
     }

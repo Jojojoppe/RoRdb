@@ -31,8 +31,10 @@ use function RoRdb\Symfony\Component\String\s;
  */
 class QuestionHelper extends Helper
 {
+    /**
+     * @var resource|null
+     */
     private $inputStream;
-    private static $shell;
     private static $stty = \true;
     private static $stdinIsInteractive;
     /**

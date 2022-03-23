@@ -98,7 +98,7 @@ class Question
         return $this;
     }
     /**
-     * In case the response can not be hidden, whether to fallback on non-hidden question or not.
+     * In case the response cannot be hidden, whether to fallback on non-hidden question or not.
      *
      * @return bool
      */
@@ -107,7 +107,7 @@ class Question
         return $this->hiddenFallback;
     }
     /**
-     * Sets whether to fallback on non-hidden question if the response can not be hidden.
+     * Sets whether to fallback on non-hidden question if the response cannot be hidden.
      *
      * @return $this
      */

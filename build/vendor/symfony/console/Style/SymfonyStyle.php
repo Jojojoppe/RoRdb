@@ -20,6 +20,7 @@ use RoRdb\Symfony\Component\Console\Helper\Table;
 use RoRdb\Symfony\Component\Console\Helper\TableCell;
 use RoRdb\Symfony\Component\Console\Helper\TableSeparator;
 use RoRdb\Symfony\Component\Console\Input\InputInterface;
+use RoRdb\Symfony\Component\Console\Output\ConsoleOutputInterface;
 use RoRdb\Symfony\Component\Console\Output\OutputInterface;
 use RoRdb\Symfony\Component\Console\Output\TrimmedBufferOutput;
 use RoRdb\Symfony\Component\Console\Question\ChoiceQuestion;
@@ -35,6 +36,7 @@ class SymfonyStyle extends OutputStyle
 {
     public const MAX_LINE_LENGTH = 120;
     private $input;
+    private $output;
     private $questionHelper;
     private $progressBar;
     private $lineLength;
@@ -46,7 +48,7 @@ class SymfonyStyle extends OutputStyle
         // Windows cmd wraps lines as soon as the terminal width is reached, whether there are following chars or not.
         $width = (new Terminal())->getWidth() ?: self::MAX_LINE_LENGTH;
         $this->lineLength = \min($width - (int) (\DIRECTORY_SEPARATOR === '\\'), self::MAX_LINE_LENGTH);
-        parent::__construct($output);
+        parent::__construct($this->output = $output);
     }
     /**
      * Formats a message as a block of text.
@@ -159,13 +161,7 @@ class SymfonyStyle extends OutputStyle
      */
     public function table(array $headers, array $rows)
     {
-        $style = clone Table::getStyleDefinition('symfony-style-guide');
-        $style->setCellHeaderFormat('<info>%s</info>');
-        $table = new Table($this);
-        $table->setHeaders($headers);
-        $table->setRows($rows);
-        $table->setStyle($style);
-        $table->render();
+        $this->createTable()->setHeaders($headers)->setRows($rows)->render();
         $this->newLine();
     }
     /**
@@ -173,14 +169,7 @@ class SymfonyStyle extends OutputStyle
      */
     public function horizontalTable(array $headers, array $rows)
     {
-        $style = clone Table::getStyleDefinition('symfony-style-guide');
-        $style->setCellHeaderFormat('<info>%s</info>');
-        $table = new Table($this);
-        $table->setHeaders($headers);
-        $table->setRows($rows);
-        $table->setStyle($style);
-        $table->setHorizontal(\true);
-        $table->render();
+        $this->createTable()->setHorizontal(\true)->setHeaders($headers)->setRows($rows)->render();
         $this->newLine();
     }
     /**
@@ -195,9 +184,6 @@ class SymfonyStyle extends OutputStyle
      */
     public function definitionList(...$list)
     {
-        $style = clone Table::getStyleDefinition('symfony-style-guide');
-        $style->setCellHeaderFormat('<info>%s</info>');
-        $table = new Table($this);
         $headers = [];
         $row = [];
         foreach ($list as $value) {
@@ -217,12 +203,7 @@ class SymfonyStyle extends OutputStyle
             $headers[] = \key($value);
             $row[] = \current($value);
         }
-        $table->setHeaders($headers);
-        $table->setRows([$row]);
-        $table->setHorizontal();
-        $table->setStyle($style);
-        $table->render();
-        $this->newLine();
+        $this->horizontalTable($headers, [$row]);
     }
     /**
      * {@inheritdoc}
@@ -301,6 +282,14 @@ class SymfonyStyle extends OutputStyle
         return $progressBar;
     }
     /**
+     * @see ProgressBar::iterate()
+     */
+    public function progressIterate(iterable $iterable, int $max = null) : iterable
+    {
+        yield from $this->createProgressBar()->iterate($iterable, $max);
+        $this->newLine(2);
+    }
+    /**
      * @return mixed
      */
     public function askQuestion(Question $question)
@@ -360,6 +349,13 @@ class SymfonyStyle extends OutputStyle
     public function getErrorStyle()
     {
         return new self($this->input, $this->getErrorOutput());
+    }
+    public function createTable() : Table
+    {
+        $output = $this->output instanceof ConsoleOutputInterface ? $this->output->section() : $this->output;
+        $style = clone Table::getStyleDefinition('symfony-style-guide');
+        $style->setCellHeaderFormat('<info>%s</info>');
+        return (new Table($output))->setStyle($style);
     }
     private function getProgressBar() : ProgressBar
     {

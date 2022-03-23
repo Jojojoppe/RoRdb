@@ -22,7 +22,7 @@ namespace RoRdb\Symfony\Component\Finder\Iterator;
  */
 class DepthRangeFilterIterator extends \FilterIterator
 {
-    private int $minDepth = 0;
+    private $minDepth = 0;
     /**
      * @param \RecursiveIteratorIterator<\RecursiveIterator<TKey, TValue>> $iterator The Iterator to filter
      * @param int                                                          $minDepth The min depth
@@ -36,8 +36,11 @@ class DepthRangeFilterIterator extends \FilterIterator
     }
     /**
      * Filters the iterator values.
+     *
+     * @return bool
      */
-    public function accept() : bool
+    #[\ReturnTypeWillChange]
+    public function accept()
     {
         return $this->getInnerIterator()->getDepth() >= $this->minDepth;
     }

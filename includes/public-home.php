@@ -1,7 +1,5 @@
 <?php
 
-// use RoRdb\GuzzleHttp\ClientInterface;
-
 function rordb_public_home_sidebar(){
     $ret = "";
 
@@ -73,9 +71,6 @@ function rordb_public_home_main(){
     $ret = "";
 
     $ret .= "<h2>Home</h2>";
-
-    // $guzzleVersion = ClientInterface::MAJOR_VERSION;
-    // $ret .= "Guzzle version: $guzzleVersion<br>";
 
     return $ret;
 }

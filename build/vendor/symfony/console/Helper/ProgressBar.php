@@ -100,8 +100,6 @@ final class ProgressBar
      * Gets the placeholder formatter for a given name.
      *
      * @param string $name The placeholder name (including the delimiter char like %)
-     *
-     * @return callable|null A PHP callable
      */
     public static function getPlaceholderFormatterDefinition(string $name) : ?callable
     {
@@ -129,8 +127,6 @@ final class ProgressBar
      * Gets the format for a given name.
      *
      * @param string $name The format name
-     *
-     * @return string|null A format string
      */
     public static function getFormatDefinition(string $name) : ?string
     {
@@ -209,10 +205,7 @@ final class ProgressBar
     }
     public function getBarCharacter() : string
     {
-        if (null === $this->barChar) {
-            return $this->max ? '=' : $this->emptyBarChar;
-        }
-        return $this->barChar;
+        return $this->barChar ?? ($this->max ? '=' : $this->emptyBarChar);
     }
     public function setEmptyBarCharacter(string $char)
     {

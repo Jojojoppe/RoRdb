@@ -15,9 +15,6 @@ use RoRdb\Psr\Log\InvalidArgumentException;
 use RoRdb\Psr\Log\LogLevel;
 use RoRdb\Symfony\Component\Console\Output\ConsoleOutputInterface;
 use RoRdb\Symfony\Component\Console\Output\OutputInterface;
-if ((new \ReflectionMethod(AbstractLogger::class, 'log'))->hasReturnType()) {
-    throw new \RuntimeException(\sprintf('The "%s" logger is not compatible with psr/log >= 3.0. Try running "composer require psr/log:^2.".', ConsoleLogger::class));
-}
 /**
  * PSR-3 compliant console logger.
  *

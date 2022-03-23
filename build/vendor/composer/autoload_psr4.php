@@ -21,7 +21,7 @@ return array(
     'RoRdb\\Symfony\\Component\\Filesystem\\' => array($vendorDir . '/symfony/filesystem'),
     'RoRdb\\Symfony\\Component\\Console\\' => array($vendorDir . '/symfony/console'),
     'RoRdb\\Safe\\' => array($vendorDir . '/thecodingmachine/safe/lib', $vendorDir . '/thecodingmachine/safe/deprecated', $vendorDir . '/thecodingmachine/safe/generated'),
-    'RoRdb\\Psr\\Log\\' => array($vendorDir . '/psr/log/src'),
+    'RoRdb\\Psr\\Log\\' => array($vendorDir . '/psr/log/Psr/Log'),
     'RoRdb\\Psr\\Http\\Message\\' => array($vendorDir . '/psr/http-factory/src', $vendorDir . '/psr/http-message/src'),
     'RoRdb\\Psr\\Http\\Client\\' => array($vendorDir . '/psr/http-client/src'),
     'RoRdb\\Psr\\EventDispatcher\\' => array($vendorDir . '/psr/event-dispatcher/src'),

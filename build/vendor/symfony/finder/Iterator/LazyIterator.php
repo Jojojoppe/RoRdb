@@ -17,10 +17,10 @@ namespace RoRdb\Symfony\Component\Finder\Iterator;
  */
 class LazyIterator implements \IteratorAggregate
 {
-    private \Closure $iteratorFactory;
+    private $iteratorFactory;
     public function __construct(callable $iteratorFactory)
     {
-        $this->iteratorFactory = $iteratorFactory instanceof \Closure ? $iteratorFactory : \Closure::fromCallable($iteratorFactory);
+        $this->iteratorFactory = $iteratorFactory;
     }
     public function getIterator() : \Traversable
     {

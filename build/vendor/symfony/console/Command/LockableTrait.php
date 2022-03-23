@@ -11,8 +11,8 @@
 namespace RoRdb\Symfony\Component\Console\Command;
 
 use RoRdb\Symfony\Component\Console\Exception\LogicException;
-use RoRdb\Symfony\Component\Lock\Lock;
 use RoRdb\Symfony\Component\Lock\LockFactory;
+use RoRdb\Symfony\Component\Lock\LockInterface;
 use RoRdb\Symfony\Component\Lock\Store\FlockStore;
 use RoRdb\Symfony\Component\Lock\Store\SemaphoreStore;
 /**
@@ -22,7 +22,7 @@ use RoRdb\Symfony\Component\Lock\Store\SemaphoreStore;
  */
 trait LockableTrait
 {
-    /** @var Lock */
+    /** @var LockInterface|null */
     private $lock;
     /**
      * Locks a command.

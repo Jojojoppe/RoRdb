@@ -26,8 +26,6 @@ class ApplicationTester
 {
     use TesterTrait;
     private $application;
-    private $input;
-    private $statusCode;
     public function __construct(Application $application)
     {
         $this->application = $application;

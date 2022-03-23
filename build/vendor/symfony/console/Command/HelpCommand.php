@@ -10,6 +10,9 @@
  */
 namespace RoRdb\Symfony\Component\Console\Command;
 
+use RoRdb\Symfony\Component\Console\Completion\CompletionInput;
+use RoRdb\Symfony\Component\Console\Completion\CompletionSuggestions;
+use RoRdb\Symfony\Component\Console\Descriptor\ApplicationDescription;
 use RoRdb\Symfony\Component\Console\Helper\DescriptorHelper;
 use RoRdb\Symfony\Component\Console\Input\InputArgument;
 use RoRdb\Symfony\Component\Console\Input\InputInterface;
@@ -58,5 +61,17 @@ EOF
         $helper->describe($output, $this->command, ['format' => $input->getOption('format'), 'raw_text' => $input->getOption('raw')]);
         $this->command = null;
         return 0;
+    }
+    public function complete(CompletionInput $input, CompletionSuggestions $suggestions) : void
+    {
+        if ($input->mustSuggestArgumentValuesFor('command_name')) {
+            $descriptor = new ApplicationDescription($this->getApplication());
+            $suggestions->suggestValues(\array_keys($descriptor->getCommands()));
+            return;
+        }
+        if ($input->mustSuggestOptionValuesFor('format')) {
+            $helper = new DescriptorHelper();
+            $suggestions->suggestValues($helper->getFormats());
+        }
     }
 }

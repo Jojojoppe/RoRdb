@@ -2,5 +2,10 @@
     "require": {
         "google\/apiclient": "^2.12.1",
         "humbug\/php-scoper": "^0.17.2"
+    },
+    "config": {
+        "platform": {
+            "php": "7.4"
+        }
     }
 }

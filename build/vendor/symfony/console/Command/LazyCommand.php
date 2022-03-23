@@ -11,6 +11,8 @@
 namespace RoRdb\Symfony\Component\Console\Command;
 
 use RoRdb\Symfony\Component\Console\Application;
+use RoRdb\Symfony\Component\Console\Completion\CompletionInput;
+use RoRdb\Symfony\Component\Console\Completion\CompletionSuggestions;
 use RoRdb\Symfony\Component\Console\Helper\HelperSet;
 use RoRdb\Symfony\Component\Console\Input\InputDefinition;
 use RoRdb\Symfony\Component\Console\Input\InputInterface;
@@ -53,6 +55,10 @@ final class LazyCommand extends Command
     public function run(InputInterface $input, OutputInterface $output) : int
     {
         return $this->getCommand()->run($input, $output);
+    }
+    public function complete(CompletionInput $input, CompletionSuggestions $suggestions) : void
+    {
+        $this->getCommand()->complete($input, $suggestions);
     }
     /**
      * @return $this

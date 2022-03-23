@@ -20,7 +20,7 @@ use RoRdb\Symfony\Component\Finder\Comparator\NumberComparator;
  */
 class SizeRangeFilterIterator extends \FilterIterator
 {
-    private array $comparators = [];
+    private $comparators = [];
     /**
      * @param \Iterator<string, \SplFileInfo> $iterator
      * @param NumberComparator[]              $comparators
@@ -32,8 +32,11 @@ class SizeRangeFilterIterator extends \FilterIterator
     }
     /**
      * Filters the iterator values.
+     *
+     * @return bool
      */
-    public function accept() : bool
+    #[\ReturnTypeWillChange]
+    public function accept()
     {
         $fileinfo = $this->current();
         if (!$fileinfo->isFile()) {

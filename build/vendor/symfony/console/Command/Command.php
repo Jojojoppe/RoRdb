@@ -12,6 +12,8 @@ namespace RoRdb\Symfony\Component\Console\Command;
 
 use RoRdb\Symfony\Component\Console\Application;
 use RoRdb\Symfony\Component\Console\Attribute\AsCommand;
+use RoRdb\Symfony\Component\Console\Completion\CompletionInput;
+use RoRdb\Symfony\Component\Console\Completion\CompletionSuggestions;
 use RoRdb\Symfony\Component\Console\Exception\ExceptionInterface;
 use RoRdb\Symfony\Component\Console\Exception\InvalidArgumentException;
 use RoRdb\Symfony\Component\Console\Exception\LogicException;
@@ -55,7 +57,7 @@ class Command
     private $usages = [];
     private $helperSet;
     /**
-     * @return string|null The default command name or null when no default name is set
+     * @return string|null
      */
     public static function getDefaultName()
     {
@@ -66,9 +68,6 @@ class Command
         $r = new \ReflectionProperty($class, 'defaultName');
         return $class === $r->class ? static::$defaultName : null;
     }
-    /**
-     * @return string|null The default command description or null when no default description is set
-     */
     public static function getDefaultDescription() : ?string
     {
         $class = static::class;
@@ -128,7 +127,7 @@ class Command
     /**
      * Gets the helper set.
      *
-     * @return HelperSet|null A HelperSet instance
+     * @return HelperSet|null
      */
     public function getHelperSet()
     {
@@ -137,7 +136,7 @@ class Command
     /**
      * Gets the application instance for this command.
      *
-     * @return Application|null An Application instance
+     * @return Application|null
      */
     public function getApplication()
     {
@@ -146,7 +145,7 @@ class Command
     /**
      * Checks whether the command is enabled or not in the current environment.
      *
-     * Override this to check for x or y and return false if the command can not
+     * Override this to check for x or y and return false if the command cannot
      * run properly under the current conditions.
      *
      * @return bool
@@ -265,6 +264,12 @@ class Command
         return \is_numeric($statusCode) ? (int) $statusCode : 0;
     }
     /**
+     * Adds suggestions to $suggestions for the current completion input (e.g. option or argument).
+     */
+    public function complete(CompletionInput $input, CompletionSuggestions $suggestions) : void
+    {
+    }
+    /**
      * Sets the code to execute when running this command.
      *
      * If this method is used, it overrides the code defined
@@ -341,7 +346,7 @@ class Command
     /**
      * Gets the InputDefinition attached to this Command.
      *
-     * @return InputDefinition An InputDefinition instance
+     * @return InputDefinition
      */
     public function getDefinition()
     {
@@ -355,7 +360,7 @@ class Command
      *
      * This method is not part of public API and should not be used directly.
      *
-     * @return InputDefinition An InputDefinition instance
+     * @return InputDefinition
      */
     public function getNativeDefinition()
     {
@@ -474,7 +479,7 @@ class Command
     /**
      * Returns the description for the command.
      *
-     * @return string The description for the command
+     * @return string
      */
     public function getDescription()
     {
@@ -493,7 +498,7 @@ class Command
     /**
      * Returns the help for the command.
      *
-     * @return string The help for the command
+     * @return string
      */
     public function getHelp()
     {
@@ -503,7 +508,7 @@ class Command
      * Returns the processed help for the command replacing the %command.name% and
      * %command.full_name% patterns with the real values dynamically.
      *
-     * @return string The processed help for the command
+     * @return string
      */
     public function getProcessedHelp()
     {
@@ -535,7 +540,7 @@ class Command
     /**
      * Returns the aliases for the command.
      *
-     * @return array An array of aliases for the command
+     * @return array
      */
     public function getAliases()
     {
@@ -546,7 +551,7 @@ class Command
      *
      * @param bool $short Whether to show the short version of the synopsis (with options folded) or not
      *
-     * @return string The synopsis
+     * @return string
      */
     public function getSynopsis(bool $short = \false)
     {
@@ -581,7 +586,7 @@ class Command
     /**
      * Gets a helper instance by name.
      *
-     * @return mixed The helper value
+     * @return mixed
      *
      * @throws LogicException           if no HelperSet is defined
      * @throws InvalidArgumentException if the helper is not defined

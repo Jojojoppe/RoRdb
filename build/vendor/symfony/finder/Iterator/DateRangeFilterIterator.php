@@ -20,7 +20,7 @@ use RoRdb\Symfony\Component\Finder\Comparator\DateComparator;
  */
 class DateRangeFilterIterator extends \FilterIterator
 {
-    private array $comparators = [];
+    private $comparators = [];
     /**
      * @param \Iterator<string, \SplFileInfo> $iterator
      * @param DateComparator[]                $comparators
@@ -32,8 +32,11 @@ class DateRangeFilterIterator extends \FilterIterator
     }
     /**
      * Filters the iterator values.
+     *
+     * @return bool
      */
-    public function accept() : bool
+    #[\ReturnTypeWillChange]
+    public function accept()
     {
         $fileinfo = $this->current();
         if (!\file_exists($fileinfo->getPathname())) {
