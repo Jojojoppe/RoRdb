@@ -4,7 +4,7 @@ function rordb_public_hier_edit_sidebar($tab, $can_create, $can_edit, $name){
     $ret = "";
 
     // Create database instance
-    $db = new RordbDatabase();
+    $db = new RoRdb\RordbDatabase();
 
     // Do actions if needed
     // Check if need to create hier
@@ -71,7 +71,7 @@ function rordb_public_hier_main($tab, $can_edit, $can_create, $nameS, $nameP){
             return rordb_show_errors();
         }
 
-        $db = new RordbDatabase();
+        $db = new RoRdb\RordbDatabase();
 
         // Show errors if needed
         $ret .= rordb_show_errors();
@@ -113,7 +113,7 @@ function rordb_public_hier_main($tab, $can_edit, $can_create, $nameS, $nameP){
             return rordb_show_errors();
         }
 
-        $db = new RordbDatabase();
+        $db = new RoRdb\RordbDatabase();
 
         // Show errors if needed
         $ret .= rordb_show_errors();

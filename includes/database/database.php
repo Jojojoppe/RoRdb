@@ -1,5 +1,7 @@
 <?php
 
+namespace RoRdb;
+
 class RordbDatabase{
 
 	public $api;

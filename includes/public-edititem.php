@@ -31,7 +31,7 @@ function rordb_public_edititem_main(){
 	wp_enqueue_script('rordb_public_items_js', plugin_dir_url(__FILE__)."../resources/js/settings_fields.js", array(), null, true);
 
     // Create database object to interact with
-    $db = new RordbDatabase();
+    $db = new RoRdb\RordbDatabase();
 
     // Check if there is an item to edit
     if(!isset($_GET['rordb_edit_item'])){

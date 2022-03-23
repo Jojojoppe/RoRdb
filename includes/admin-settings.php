@@ -35,7 +35,7 @@ function rordb_options_page_html(){
 			add_settings_error('rordb_messages', 'rordb_message',
 				__('Loading database', 'rordb'), 'updated');
 
-			$db = new RordbDatabase();
+			$db = new RoRdb\RordbDatabase();
 			if(!$db->load_database()){
 				add_settings_error('rordb_messages', 'rordb_message',
 					__('While loading the database an error occured', 'rordb'), 'error');		
@@ -46,7 +46,7 @@ function rordb_options_page_html(){
 			add_settings_error('rordb_messages', 'rordb_message',
 				__('(Re)create database', 'rordb'), 'updated');
 
-			$db = new RordbDatabase();
+			$db = new RoRdb\RordbDatabase();
 			if(!$db->create_database()){
 				add_settings_error('rordb_messages', 'rordb_message',
 					__('While (re)creating the database an error occured', 'rordb'), 'error');		
@@ -57,7 +57,7 @@ function rordb_options_page_html(){
 			add_settings_error('rordb_messages', 'rordb_message',
 				__('Delete database', 'rordb'), 'updated');
 
-			$db = new RordbDatabase();
+			$db = new RoRdb\RordbDatabase();
 			if(!$db->delete_database()){
 				add_settings_error('rordb_messages', 'rordb_message',
 					__('While deleting the database an error occured', 'rordb'), 'error');		

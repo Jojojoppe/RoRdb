@@ -39,7 +39,7 @@ if(!defined('WPINC')){
 define("RORDB_VERSION", "0.1.0");
 
 // Google stuff
-require_once plugin_dir_path(__FILE__)."vendor/autoload.php";
+require_once plugin_dir_path(__FILE__)."build/vendor/autoload.php";
 require_once plugin_dir_path(__FILE__)."includes/googleapi/api.php";
 // RoRdb database interface
 require_once plugin_dir_path(__FILE__)."includes/database/database.php";

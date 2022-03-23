@@ -57,7 +57,7 @@ function rordb_public_items_main(){
     }
 
     // Perform search
-    $db = new RordbDatabase();
+    $db = new RoRdb\RordbDatabase();
 
     // Perform search
     $searchresults = $db->items_search($_POST['rordb_searchtag'], [], []);
