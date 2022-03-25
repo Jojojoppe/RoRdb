@@ -1,14 +1,14 @@
 <?php
 
-function rordb_error($type, $msg){
-    if(!isset($_SESSION['RORDB_ERROR'])) $_SESSION['RORDB_ERROR'] = [];
-    $_SESSION['RORDB_ERROR'] = array_merge($_SESSION['RORDB_ERROR'], [[$type, $msg]]);
+function dotcomwpp_error($type, $msg){
+    if(!isset($_SESSION['DOTCOMWPP_ERROR'])) $_SESSION['DOTCOMWPP_ERROR'] = [];
+    $_SESSION['DOTCOMWPP_ERROR'] = array_merge($_SESSION['DOTCOMWPP_ERROR'], [[$type, $msg]]);
 }
 
-function rordb_show_errors(){
+function dotcomwpp_show_errors(){
     $ret = "";
-    if(isset($_SESSION['RORDB_ERROR'])){
-        foreach($_SESSION['RORDB_ERROR'] as $e){
+    if(isset($_SESSION['DOTCOMWPP_ERROR'])){
+        foreach($_SESSION['DOTCOMWPP_ERROR'] as $e){
             if($e[1]=="error"){
                 $ret .= "<div width='100%' style='background-color:#ff6666'>ERROR: ";
             }else{
@@ -17,7 +17,7 @@ function rordb_show_errors(){
             $ret .= $e[0];
             $ret .= "</div>";       
         }
-        unset($_SESSION['RORDB_ERROR']);
+        unset($_SESSION['DOTCOMWPP_ERROR']);
     };
     return $ret;
 }
