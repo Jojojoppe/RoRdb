@@ -1,11 +1,11 @@
 <?php
 
-function dotcomwpp_error($type, $msg){
+function rordb_error($type, $msg){
     if(!isset($_SESSION['DOTCOMWPP_ERROR'])) $_SESSION['DOTCOMWPP_ERROR'] = [];
     $_SESSION['DOTCOMWPP_ERROR'] = array_merge($_SESSION['DOTCOMWPP_ERROR'], [[$type, $msg]]);
 }
 
-function dotcomwpp_show_errors(){
+function rordb_show_errors(){
     $ret = "";
     if(isset($_SESSION['DOTCOMWPP_ERROR'])){
         foreach($_SESSION['DOTCOMWPP_ERROR'] as $e){
