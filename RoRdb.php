@@ -2,7 +2,7 @@
 /*
 Plugin Name: RoRdb
 Plugin URI: https://github.com/Jojojoppe/RoRdb
-Version: 0.1.2-3
+Version: 0.1.2-4
 License: BSD-2
 Author: Joppe Blondel
 Author URI: https://joppeb.nl
@@ -36,7 +36,7 @@ if(!defined('WPINC')){
 	die;
 }
 
-define("RORDB_VERSION", "0.1.2-3");
+define("RORDB_VERSION", "0.1.2-4");
 
 // Updater
 require_once plugin_dir_path(__FILE__)."includes/updater.php";
@@ -88,7 +88,7 @@ if (is_admin()) { // note the use of is_admin() to double check that this is hap
       'zip_url' => 'https://api.github.com/repos/Jojojoppe/RoRdb/zipball/master', // the zip url of the github repo
       'sslverify' => true, // wether WP should check the validity of the SSL cert when getting an update, see https://github.com/jkudish/WordPress-GitHub-Plugin-Updater/issues/2 and https://github.com/jkudish/WordPress-GitHub-Plugin-Updater/issues/4 for details
       'requires' => '5.0', // which version of WordPress does your plugin require?
-      'tested' => '5.9.2', // which version of WordPress is your plugin tested up to?
+      'tested' => '5.9', // which version of WordPress is your plugin tested up to?
       'readme' => 'README.MD', // which file to use as the readme for the version number
       'access_token' => '', // Access private repositories by authorizing under Appearance > Github Updates when this example plugin is installed
    );
