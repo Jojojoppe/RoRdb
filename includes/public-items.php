@@ -72,7 +72,8 @@ function rordb_public_items_main(){
             $ret .= "</div>";
             $ret .= "<div class='wp-block-column' style='flex-basis:50%;'>";
                         $pageid = ''; //$_GET['page_id'];
-                        $ret .= "<a href='?page_id=".$pageid."&rordb_action=edititem&rordb_edit_item=".$i[0]."'>Edit item</a><br>";
+                        // $ret .= "<a href='?page_id=".$pageid."&rordb_action=edititem&rordb_edit_item=".$i[0]."'>Edit item</a><br>";
+                        $ret .= "<a href=''>Edit item</a><br>";
                         $ret .= "Name: " . $i[1] . "<br>";
                         $ret .= "Category: " . $i[9] . "<br>";
                         $ret .= "Location: " . $i[11] . "<br>";

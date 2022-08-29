@@ -1,0 +1,14 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"type": "npm",
+			"script": "watch-poll",
+			"path": "vendor/humbug/php-scoper/fixtures/set027-laravel",
+			"group": "build",
+			"problemMatcher": [],
+			"label": "npm: watch-poll - vendor/humbug/php-scoper/fixtures/set027-laravel",
+			"detail": "npm run watch -- --watch-poll"
+		}
+	]
+}

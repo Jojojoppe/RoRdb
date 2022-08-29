@@ -531,7 +531,15 @@ class RordbDatabase{
 	function dbLookup($query, $sheetid, $sheet){
 		$databaseURL = "https://docs.google.com/a/google.com/spreadsheets/d/".$sheetid."/gviz/tq?tq=";
 		$url = $databaseURL.$this->encodeURIComponent($query)."&sheet=".$sheet;
-		$response = file_get_contents($url);
+		// $response = file_get_contents($url);
+
+		$ch = curl_init();
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_URL, $url);
+        $response = curl_exec($ch);
+        curl_close($ch);
+
 		$response = explode(");", explode("setResponse(", $response)[1])[0];
 		return json_decode($response, TRUE);
 	}
