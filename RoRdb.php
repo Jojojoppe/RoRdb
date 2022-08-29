@@ -2,7 +2,7 @@
 /*
 Plugin Name: RoRdb
 Plugin URI: https://github.com/Jojojoppe/RoRdb
-Version: 0.1.2-2
+Version: 0.1.2-3
 License: BSD-2
 Author: Joppe Blondel
 Author URI: https://joppeb.nl
@@ -36,7 +36,7 @@ if(!defined('WPINC')){
 	die;
 }
 
-define("RORDB_VERSION", "0.1.2-2");
+define("RORDB_VERSION", "0.1.2-3");
 
 // Updater
 require_once plugin_dir_path(__FILE__)."includes/updater.php";

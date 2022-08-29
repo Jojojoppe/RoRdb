@@ -429,6 +429,11 @@ class RordbDatabase{
 	}
 
 	function delete_item($id){
+		// Get category, location and claimed columns
+		$abc = ['J', 'K', 'L', 'M', 'N', 'O', 'P'];
+		$catcol = $abc[($this->hier["Categories"]-1)*2];
+		$loccol = $abc[($this->hier["Locations"]-1)*2];
+		$clmcol = $abc[($this->hier["Claimgroups"]-1)*2];
 		try{
 			$this->api->sheets_put_range($this->sheet, "Items", "A".((int)$id+2), [
 				["", "", "", "", "", "", "", '', ""]
