@@ -10,5 +10,5 @@ composer dump-autoload --working-dir build --classmap-authoritative
 Note: php and composer must be installed on the system
 
 <!---
-~Current Version:0.1.1~
+~Current Version:0.1.2-1~
 --->

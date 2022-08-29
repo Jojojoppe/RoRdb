@@ -56,17 +56,25 @@ function rordb_public_edititem_main(){
             $foldername = get_option('rordb_drive_id');
             $fid = $db->api->drive_upload_file($foldername, "img".uniqid(), $_POST['rordb_create_img']);
             $db->api->drive_share($fid, "", "reader");
+        }else{
+            $fid = $_POST['rordb_create_img_old'];
         }
 
-        // Edit the item
-        $db->update_item($_GET['rordb_edit_item'], $_POST['rordb_create_name'], $_POST['rordb_create_category'], $_POST['rordb_create_location'],
-            $_POST['rordb_create_color'], $_POST['rordb_create_size'], $_POST['rordb_create_amount'],
-            $_POST['rordb_create_comments'],
-            $fid,
-            $_POST['rordb_create_claimed'], $_POST['rordb_create_hidden']
-        );
+        // Check if to delete or not
+        if(isset($_POST['rordb_create_delete'])){
+            $db->delete_item($_GET['rordb_edit_item']);
+            rordb_error("Item successfully DELETED", "message");
+        }else{
+            // Edit the item
+            $db->update_item($_GET['rordb_edit_item'], $_POST['rordb_create_name'], $_POST['rordb_create_category'], $_POST['rordb_create_location'],
+                $_POST['rordb_create_color'], $_POST['rordb_create_size'], $_POST['rordb_create_amount'],
+                $_POST['rordb_create_comments'],
+                $fid,
+                $_POST['rordb_create_claimed'], $_POST['rordb_create_hidden']
+            );
 
-        rordb_error("Item successfully updated", "message");
+            rordb_error("Item successfully updated", "message");
+        }
     }
         
     // Show errors if needed
@@ -147,9 +155,13 @@ function rordb_public_edititem_main(){
     // Image
     $ret .= add_field('
         <input type="hidden" name="rordb_create_img" id="rordb_create_img">
+        <input type="hidden" name="rordb_create_img_old" id="rordb_create_img_old" value="'.$items[6].'">
                     <img id="rordb_imgtest" width=200 src="https://drive.google.com/thumbnail?id='.$items[6].'&sz=w200-h200"><br>
         <input type="file" accept="image/*" id="rordb_file_imgtest" onchange=\'javscript:rordb_put_imgcontent_in_img("rordb_file_imgtest", "rordb_imgtest", "rordb_create_img")\'>
     ', "Image");
+
+    // Delete item
+    $ret .= add_field('<input type="checkbox" name="rordb_create_delete">', "Delete item (!)");
 
     $ret .= '<p class="submit"><input type="submit" value="Edit Item" class="button button-primary"></p></form></div>';
 

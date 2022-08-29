@@ -430,7 +430,18 @@ class RordbDatabase{
 
 	function delete_item($id){
 		try{
-			throw "Not implemented yet";
+			$this->api->sheets_put_range($this->sheet, "Items", "A".((int)$id+2), [
+				["", "", "", "", "", "", "", '', ""]
+			], false);
+			$this->api->sheets_put_range($this->sheet, "Items", $catcol.((int)$id+2), [
+				[""]
+			], false);
+			$this->api->sheets_put_range($this->sheet, "Items", $loccol.((int)$id+2), [
+				[""]
+			], false);
+			$this->api->sheets_put_range($this->sheet, "Items", $clmcol.((int)$id+2), [
+				[""]
+			], false);
 		}catch(Exception $e){
 			$this->error(__FUNCTION__.": ".$e->getMessage());
 		}
