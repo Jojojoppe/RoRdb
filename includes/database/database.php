@@ -436,7 +436,7 @@ class RordbDatabase{
 		$clmcol = $abc[($this->hier["Claimgroups"]-1)*2];
 		try{
 			$this->api->sheets_put_range($this->sheet, "Items", "A".((int)$id+2), [
-				["", "", "", "", "", "", "", '', ""]
+				["", "", "", "", "", "", "", '', "", "", "", "", "", "", ""]
 			], false);
 			$this->api->sheets_put_range($this->sheet, "Items", $catcol.((int)$id+2), [
 				[""]
